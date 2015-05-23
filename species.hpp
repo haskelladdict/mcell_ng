@@ -4,8 +4,8 @@
 #ifndef SPECIES_HPP
 #define SPECIES_HPP
 
+#include <memory>
 #include <string>
-
 
 // MolSpecies describes 2D and 3D species
 class MolSpecies {
@@ -30,6 +30,8 @@ private:
   std::string name_;     // species name
   bool is3D_;
 };
+
+using MolSpecPtr = std::unique_ptr<MolSpecies>;
 
 
 #endif

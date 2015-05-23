@@ -4,10 +4,10 @@
 #ifndef MOLECULES_HPP
 #define MOLECULES_HPP
 
+#include <memory>
 
 #include "species.hpp"
 #include "util.hpp"
-
 
 // Mol is the abstract base class for describing 2D and 3D molecules
 class Mol {
@@ -48,5 +48,6 @@ private:
   vector3D pos_;
 };
 
+using VolMolPtr = std::unique_ptr<VolMol*>;
 
 #endif

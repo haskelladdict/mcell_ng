@@ -13,9 +13,11 @@
 class RngNorm {
 
 public:
-  RngNorm(uint64_t seed = 0);
+  RngNorm(uint64_t seed);
 
-  double gen();
+  double gen() {
+    return rng_norm_(mt_gen_);
+  }
 
 private:
 

@@ -4,16 +4,39 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include <random>
+#include <vector>
+
+#include "molecules.hpp"
+#include "rng.hpp"
+#include "species.hpp"
+
+class State {
+
+public:
+
+  State(uint64_t seed = 0);
+
+  // don't allow copy & move operations
+  State(const State& s) = delete;
+  State& operator=(const State& s) = delete;
+  State(State&& s) = delete;
+  State& operator=(State&& s) = delete;
+
+  // member functions
+  double rng_norm() {
+    return rng_.gen();
+  }
+
+  const MolSpecies* add_mol_species(MolSpecPtr m);
+  bool del_mol_species(const MolSpecies *m);
 
 
-struct State {
+private:
 
-//  std::default_random_engine rnd_gen;
-//  std::normal_distribution rng_norm = std::normal_distribution<double>();
+  RngNorm rng_;
 
-//  double rng_gauss = [&]() {return rng()(rnd_gen)();};
-
+  std::vector<MolSpecPtr> species_;
+  std::vector<VolMolPtr> volMols_;
 };
 
 #endif
