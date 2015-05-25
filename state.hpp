@@ -4,11 +4,17 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include <vector>
+#include <iostream>
 
 #include "molecules.hpp"
 #include "rng.hpp"
 #include "species.hpp"
+#include "util.hpp"
+
+
+using Species = Vec<MolSpecPtr>;
+using VolMols = Vec<VolMolPtr>;
+
 
 class State {
 
@@ -28,15 +34,22 @@ public:
   }
 
   const MolSpecies* add_mol_species(MolSpecPtr m);
-  bool del_mol_species(const MolSpecies *m);
+  bool del_mol_species(const MolSpecies* m);
+
+  const VolMol* add_vol_mol(VolMolPtr m);
+  bool del_vol_mol(const VolMol* m);
+
+  const VolMols& volMols() {
+    return volMols_;
+  }
 
 
 private:
 
   RngNorm rng_;
 
-  std::vector<MolSpecPtr> species_;
-  std::vector<VolMolPtr> volMols_;
+  Species species_;
+  VolMols volMols_;
 };
 
 #endif

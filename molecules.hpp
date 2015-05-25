@@ -48,6 +48,6 @@ private:
   vector3D pos_;
 };
 
-using VolMolPtr = std::unique_ptr<VolMol*>;
+using VolMolPtr = std::unique_ptr<VolMol>;
 
 #endif
