@@ -5,6 +5,7 @@
 #define STATE_HPP
 
 #include <iostream>
+#include <unordered_map>
 
 #include "molecules.hpp"
 #include "rng.hpp"
@@ -14,6 +15,7 @@
 
 using Species = Vec<MolSpecPtr>;
 using VolMols = Vec<VolMolPtr>;
+using VolMolMap = std::unordered_map<const MolSpecies*, VolMols>;
 
 
 class State {
@@ -39,17 +41,16 @@ public:
   const VolMol* add_vol_mol(VolMolPtr m);
   bool del_vol_mol(const VolMol* m);
 
-  const VolMols& volMols() {
-    return volMols_;
+  const VolMolMap& volMolMap() {
+    return volMolMap_;
   }
-
 
 private:
 
   RngNorm rng_;
 
   Species species_;
-  VolMols volMols_;
+  VolMolMap volMolMap_;
 };
 
 #endif

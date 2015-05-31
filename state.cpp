@@ -31,20 +31,26 @@ bool State::del_mol_species(const MolSpecies* m) {
 
 
 // add_vol_mol adds a new volume molecule to the simulation
+// NOTE: We keep the molecules separated by species via an unordered_map
 const VolMol* State::add_vol_mol(VolMolPtr m) {
-  const VolMol *vm = m.get();
-  volMols_.push_back(std::move(m));
+  VolMol *vm = m.get();
+  const MolSpecies* sp = m->spec();
+  if (volMolMap_.find(sp) == volMolMap_.end()) {
+    volMolMap_[sp] = VolMols{};
+  }
+  volMolMap_[sp].push_back(std::move(m));
   return vm;
 }
 
 
 // del_vol_mol removes the provided volume molecule from the simulation
 bool State::del_vol_mol(const VolMol* m) {
-  auto it = std::find_if(volMols_.begin(), volMols_.end(), [&](const auto& p) {
+  VolMols& vm = volMolMap_[m->spec()];
+  auto it = std::find_if(vm.begin(), vm.end(), [&](const auto& p) {
     return p.get() == m;
   });
-  if (it != volMols_.end()) {
-    volMols_.erase(it);
+  if (it != vm.end()) {
+    vm.erase(it);
     return true;
   }
   return false;

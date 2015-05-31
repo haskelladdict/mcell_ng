@@ -16,20 +16,10 @@
 // write_cellblender writes the molecule info at iter to a file name in
 // cellblender format located at path.
 bool write_cellblender(std::string path, std::string name, int iter,
-  const VolMols& mols) {
+  const VolMolMap& molMap) {
 
-  if (mols.size() == 0) {
+  if (molMap.size() == 0) {
     return false;
-  }
-
-  // sort molecules according to species type
-  std::unordered_map<std::string, Vec<const VolMol*>> molMap;
-  for (const auto& m : mols) {
-    std::string name = m->spec()->name();
-    if (molMap.find(name) == molMap.end()) {
-      molMap[name] = Vec<const VolMol*>();
-    }
-    molMap[name].push_back(m.get());
   }
 
   char fileName[256];
@@ -48,7 +38,7 @@ bool write_cellblender(std::string path, std::string name, int iter,
 
   // write molecule info
   for (const auto &sp : molMap) {
-    std::string name = sp.first;
+    std::string name = sp.first->name();
     unsigned char length = name.length();
     out.write(reinterpret_cast<char*>(&length), sizeof(length));
     out.write(name.c_str(), length*sizeof(char));
