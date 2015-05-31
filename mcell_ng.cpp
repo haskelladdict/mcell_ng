@@ -21,8 +21,12 @@ int main() {
 
   State state;
   auto aSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(600, "A"));
-  for (int i=0; i < 1000; ++i) {
+  for (int i=0; i < 100; ++i) {
     state.add_vol_mol(std::make_unique<VolMol>(0, aSpecPtr, vector3D{0.0,0.0,0.0}));
+  }
+  auto bSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(60, "B"));
+  for (int i=0; i < 100; ++i) {
+    state.add_vol_mol(std::make_unique<VolMol>(0, bSpecPtr, vector3D{0.0,0.0,0.0}));
   }
 
   if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
