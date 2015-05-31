@@ -20,19 +20,27 @@ int main() {
   double dt = 1e-6;
 
   State state;
-  auto aSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(1e-6, "A"));
-  for (int i=0; i < 100; ++i) {
+  auto aSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(600, "A"));
+  for (int i=0; i < 5000; ++i) {
     state.add_vol_mol(std::make_unique<VolMol>(0, aSpecPtr, vector3D{0.0,0.0,0.0}));
   }
 
-  // do one diffusion step
-  for (const auto& m : state.volMols()) {
-    vector3D disp{sqrt(4*m->spec()->d()*dt) * state.rng_norm(),
-      sqrt(4*m->spec()->d()*dt) * state.rng_norm(),
-      sqrt(4*m->spec()->d()*dt) * state.rng_norm()
-    };
-    m->moveTo(disp += m->pos());
+  if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
+    "test", 0, state.volMols())) {
+    std::cerr << "failed to write output" << endl;
   }
-  write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
-    "test", 1, state.volMols());
+  // do a few diffusion steps
+  for (int i=1; i < 1000; ++i) {
+    cout << "iteration:   " << i << endl;
+    for (auto& m : state.volMols()) {
+      double scale = sqrt(4*m->spec()->d()*dt);
+      vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
+        scale * state.rng_norm()};
+      m->moveTo(disp += m->pos());
+    }
+    if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
+      "test", i, state.volMols())) {
+      std::cerr << "failed to write output" << endl;
+    }
+  }
 }

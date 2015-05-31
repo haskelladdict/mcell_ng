@@ -5,7 +5,9 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
+
 
 #include "io.hpp"
 #include "util.hpp"
@@ -20,29 +22,67 @@ bool write_cellblender(std::string path, std::string name, int iter,
     return false;
   }
 
-  // get a copy of list of molecules and sort them according to species type
-  Vec<const VolMol*> sortedMols(mols.size());
-  auto it = sortedMols.begin();
+  // sort molecules according to species type
+  std::unordered_map<std::string, Vec<const VolMol*>> molMap;
   for (const auto& m : mols) {
-    *(it++) = m.get();
+    std::string name = m->spec()->name();
+    if (molMap.find(name) == molMap.end()) {
+      molMap[name] = Vec<const VolMol*>();
+    }
+    molMap[name].push_back(m.get());
   }
-  std::sort(sortedMols.begin(), sortedMols.end(),
-    [](const auto& p1, const auto& p2) {
-      return p1->spec()->name() < p2->spec()->name();
-  });
 
-  std::stringstream sts;
-  sts << path << "/" << name << "." << "cellbin." << iter << ".dat";
-  std::ofstream out(sts.str());
+  char fileName[256];
+  if (snprintf(fileName, 255, "%s/%s.cellbin.%04d.dat", path.c_str(),
+    name.c_str(), iter) < 0) {
+    return false;
+  }
+  std::ofstream out(fileName);
   if (out.fail()) {
     return false;
   }
 
-  uint32_t version = 1;
+  // write version info
+  unsigned int version = 1;
   out.write(reinterpret_cast<char*>(&version), sizeof(uint32_t));
 
+  // write molecule info
+  for (const auto &sp : molMap) {
+    std::string name = sp.first;
+    unsigned char length = name.length();
+    out.write(reinterpret_cast<char*>(&length), sizeof(length));
+    out.write(name.c_str(), length*sizeof(char));
 
+    unsigned char type = 0;   // 0 indicated volume molecules
+    out.write(reinterpret_cast<char*>(&type), sizeof(type));
+
+    unsigned int numMols = 3 * sp.second.size();
+    out.write(reinterpret_cast<char*>(&numMols), sizeof(numMols));
+    for (const auto& m : sp.second) {
+      float mposx = m->pos().x;
+      out.write(reinterpret_cast<char*>(&mposx), sizeof(mposx));
+      float mposy = m->pos().y;
+      out.write(reinterpret_cast<char*>(&mposy), sizeof(mposy));
+      float mposz = m->pos().z;
+      out.write(reinterpret_cast<char*>(&mposz), sizeof(mposz));
+    }
+  }
+  out.close();
 
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
