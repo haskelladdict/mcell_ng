@@ -10,7 +10,7 @@ State::State(uint64_t seed) : rng_{seed} {}
 
 
 // add_mol_species adds a molecule species to the simulation
-const MolSpecies* State::add_mol_species(MolSpecPtr m) {
+const MolSpecies* State::add_mol_species(MolSpecies::ptr m) {
   const MolSpecies *sp = m.get();
   species_.push_back(std::move(m));
   return sp;
@@ -32,7 +32,7 @@ bool State::del_mol_species(const MolSpecies* m) {
 
 // add_vol_mol adds a new volume molecule to the simulation
 // NOTE: We keep the molecules separated by species via an unordered_map
-const VolMol* State::add_vol_mol(VolMolPtr m) {
+const VolMol* State::add_vol_mol(VolMol::ptr m) {
   VolMol *vm = m.get();
   const MolSpecies* sp = m->spec();
   if (volMolMap_.find(sp) == volMolMap_.end()) {

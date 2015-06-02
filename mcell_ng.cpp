@@ -34,7 +34,7 @@ int main() {
     std::cerr << "failed to write output" << endl;
   }
   // do a few diffusion steps
-  for (int i=1; i < 1000; ++i) {
+  for (int i=1; i < 10; ++i) {
     cout << "iteration:   " << i << endl;
     const VolMolMap& vm = state.volMolMap();
     for (auto& sp : vm) {

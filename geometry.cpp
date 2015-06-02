@@ -8,7 +8,7 @@
 
 
 // helper function for creating a WallPtr from three vertices
-WallPtr create_wall(struct vector3D p1, struct vector3D p2, struct vector3D p3) {
+Wall::ptr create_wall(struct vector3D p1, struct vector3D p2, struct vector3D p3) {
   return std::make_unique<Wall>(p1, p2, p3);
 }
 
@@ -23,7 +23,7 @@ GeomObject::GeomObject() {};
 
 
 // addWall adds a single wall the GeomObject's existing mesh
-void GeomObject::addWall(WallPtr w) {
+void GeomObject::addWall(Wall::ptr w) {
   mesh_.push_back(std::move(w));
 }
 

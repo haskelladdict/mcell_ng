@@ -9,11 +9,13 @@
 #include "util.hpp"
 
 // Wall describes a single triangle wall on a surface.
-// NOTE: The wall normal is determined by a right hand rule using v1, v2, and
-// v3 in this order
+// NOTE: The wall normal is determined via right hand rule using
+// vertex v1, v2, and v3 in this order
 class Wall {
 
 public:
+
+  using ptr = std::unique_ptr<Wall>;
 
   Wall(struct vector3D p1, struct vector3D p2, struct vector3D p3);
 
@@ -24,13 +26,11 @@ private:
   struct vector3D v2_;
   struct vector3D v3_;
 };
-
-using WallPtr = std::unique_ptr<Wall>;
-using Mesh = Vec<WallPtr>;
+using Mesh = Vec<Wall::ptr>;
 
 
 // helper function for creating a WallPtr from three vertices
-WallPtr create_wall(struct vector3D p1, struct vector3D x2, struct vector3D x3);
+Wall::ptr create_wall(struct vector3D p1, struct vector3D x2, struct vector3D x3);
 
 
 // GeomObject describes a contiguous (closed or open) surface consisting of
@@ -40,7 +40,7 @@ class GeomObject {
 public:
   GeomObject();
 
-  void addWall(WallPtr w);
+  void addWall(Wall::ptr w);
 
 
 private:

@@ -35,6 +35,9 @@ private:
 class VolMol : public Mol {
 
 public:
+
+  using ptr = std::unique_ptr<VolMol>;
+
   VolMol(double t, const MolSpecies* spec, const vector3D& pos);
 
   const vector3D& pos() const {
@@ -48,6 +51,5 @@ private:
   vector3D pos_;
 };
 
-using VolMolPtr = std::unique_ptr<VolMol>;
 
 #endif

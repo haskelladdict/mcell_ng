@@ -11,6 +11,9 @@
 class MolSpecies {
 
 public:
+
+  using ptr = std::unique_ptr<MolSpecies>;
+
   MolSpecies(double D, std::string name, bool is3D = true);
 
   double d() const {
@@ -31,7 +34,6 @@ private:
   bool is3D_;
 };
 
-using MolSpecPtr = std::unique_ptr<MolSpecies>;
 
 
 #endif
