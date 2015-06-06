@@ -8,44 +8,32 @@
 
 #include "util.hpp"
 
-// Wall describes a single triangle wall on a surface.
-// NOTE: The wall normal is determined via right hand rule using
-// vertex v1, v2, and v3 in this order
-class Wall {
 
-public:
-
-
-  Wall(struct vector3D p1, struct vector3D p2, struct vector3D p3);
-
-
-private:
-
-  struct vector3D v1_;
-  struct vector3D v2_;
-  struct vector3D v3_;
+// triangle describes a single triangle on a mesh. It consists of the indexes
+// of the vertices making up the triangle.
+struct Triangle {
+  int v1;
+  int v2;
+  int v3;
 };
-using WallPtr = std::unique_ptr<Wall>;
-using Mesh = Vec<WallPtr>;
 
 
-// helper function for creating a WallPtr from three vertices
-WallPtr create_wall(struct vector3D p1, struct vector3D x2, struct vector3D x3);
-
-
-// GeomObject describes a contiguous (closed or open) surface consisting of
-// a collection of walls
-class GeomObject {
+// Mesh describes a contiguous (closed or open) surface consisting of
+// a collection of vertices and triangular connections between them.
+class Mesh {
 
 public:
-  GeomObject();
 
-  void addWall(WallPtr w);
+  Mesh();
+
+  void add_vertex(double x, double y, double z);
+  void add_triangle(int v1, int v2, int v3);
 
 
 private:
 
-  Mesh mesh_;
+  Vec<vector3D> verts_;
+  Vec<Triangle> triangles_;
 };
 
 

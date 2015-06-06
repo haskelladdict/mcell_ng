@@ -1,29 +1,28 @@
 // Copyright 2015 Markus Dittrich
 // Licensed under BSD license, see LICENSE file for details
 
+#include <cassert>
 #include <memory>
 #include <utility>
 
 #include "geometry.hpp"
 
+// GeomObject constructor
+Mesh::Mesh() {};
 
-// helper function for creating a WallPtr from three vertices
-WallPtr create_wall(struct vector3D p1, struct vector3D p2, struct vector3D p3) {
-  return std::make_unique<Wall>(p1, p2, p3);
+
+// addVertex adds a new vertex to the Mesh at position (x,y,z)
+void Mesh::add_vertex(double x, double y, double z) {
+  verts_.emplace_back(vector3D{x, y, z});
 }
 
 
-// Wall constructor
-Wall::Wall(struct vector3D p1, struct vector3D p2, struct vector3D p3) :
-  v1_{p1}, v2_{p2}, v3_{p3} {}
+// add_triangle adds a new triangle among the available vertices of a mesh
+void Mesh::add_triangle(int v1, int v2, int v3) {
+  assert(v1 >= 0 && v1 < verts_.size());
+  assert(v2 >= 0 && v2 < verts_.size());
+  assert(v3 >= 0 && v3 < verts_.size());
 
-
-// GeomObject constructor
-GeomObject::GeomObject() {};
-
-
-// addWall adds a single wall the GeomObject's existing mesh
-void GeomObject::addWall(WallPtr w) {
-  mesh_.push_back(std::move(w));
+  triangles_.emplace_back(Triangle{v1, v2, v3});
 }
 
