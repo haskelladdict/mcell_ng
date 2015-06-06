@@ -38,7 +38,7 @@ bool write_cellblender(std::string path, std::string name, int iter,
 
   // write molecule info
   for (const auto &sp : molMap) {
-    std::string name = sp.first->name();
+    std::string name = sp.first;
     unsigned char length = name.length();
     out.write(reinterpret_cast<char*>(&length), sizeof(length));
     out.write(name.c_str(), length*sizeof(char));
