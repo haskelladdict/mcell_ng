@@ -15,7 +15,6 @@ class Wall {
 
 public:
 
-  using ptr = std::unique_ptr<Wall>;
 
   Wall(struct vector3D p1, struct vector3D p2, struct vector3D p3);
 
@@ -26,11 +25,12 @@ private:
   struct vector3D v2_;
   struct vector3D v3_;
 };
-using Mesh = Vec<Wall::ptr>;
+using WallPtr = std::unique_ptr<Wall>;
+using Mesh = Vec<WallPtr>;
 
 
 // helper function for creating a WallPtr from three vertices
-Wall::ptr create_wall(struct vector3D p1, struct vector3D x2, struct vector3D x3);
+WallPtr create_wall(struct vector3D p1, struct vector3D x2, struct vector3D x3);
 
 
 // GeomObject describes a contiguous (closed or open) surface consisting of
@@ -40,7 +40,7 @@ class GeomObject {
 public:
   GeomObject();
 
-  void addWall(Wall::ptr w);
+  void addWall(WallPtr w);
 
 
 private:
