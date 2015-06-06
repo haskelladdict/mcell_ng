@@ -13,7 +13,7 @@
 #include "util.hpp"
 
 
-using Species = Vec<MolSpecPtr>;
+using Species = Vec<MolSpecies>;
 using VolMols = Vec<VolMolPtr>;
 using VolMolMap = std::unordered_map<std::string, VolMols>;
 
@@ -35,9 +35,9 @@ public:
     return rng_.gen();
   }
 
-  const MolSpecies* add_mol_species(MolSpecPtr m);
-  const MolSpecies* get_mol_species(std::string name) const;
-  bool del_mol_species(const MolSpecies* sp);
+  const MolSpecies& add_mol_species(const MolSpecies& m);
+  const MolSpecies& get_mol_species(std::string name) const;
+  bool del_mol_species(const MolSpecies& sp);
 
   const VolMol* add_vol_mol(VolMolPtr m);
   bool del_vol_mol(const VolMol* m);

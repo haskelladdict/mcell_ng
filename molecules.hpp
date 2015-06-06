@@ -13,21 +13,21 @@
 class Mol {
 
 public:
-  Mol(double t, const MolSpecies* spec);
+  Mol(double t, const MolSpecies& spec);
   virtual ~Mol() = 0;
 
   double t() const {
     return t_;
   }
 
-  const MolSpecies* spec() const {
+  const MolSpecies& spec() const {
     return spec_;
   }
 
 
 private:
   double t_;               // birthday
-  const MolSpecies* spec_; // what species are we
+  const MolSpecies& spec_; // what species are we
 };
 
 
@@ -36,7 +36,7 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(double t, const MolSpecies* spec, const vector3D& pos);
+  VolMol(double t, const MolSpecies& spec, const vector3D& pos);
 
   const vector3D& pos() const {
     return pos_;

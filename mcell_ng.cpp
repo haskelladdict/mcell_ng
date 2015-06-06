@@ -20,14 +20,17 @@ int main() {
   double dt = 1e-6;
 
   State state;
-  auto aSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(600, "A"));
+  auto aSpecPtr = state.add_mol_species(MolSpecies{600, "A"});
   for (int i=0; i < 100; ++i) {
     state.add_vol_mol(std::make_unique<VolMol>(0, aSpecPtr, vector3D{0.0,0.0,0.0}));
   }
-  auto bSpecPtr = state.add_mol_species(std::make_unique<MolSpecies>(60, "B"));
+  auto bSpecPtr = state.add_mol_species(MolSpecies{60, "B"});
   for (int i=0; i < 100; ++i) {
     state.add_vol_mol(std::make_unique<VolMol>(0, bSpecPtr, vector3D{0.0,0.0,0.0}));
   }
+
+  //cout << state.del_mol_species(aSpecPtr) << endl;
+  cout << state.get_mol_species("A").name() << endl;
 
   if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
     "test", 0, state.volMolMap())) {
@@ -39,7 +42,7 @@ int main() {
     const VolMolMap& vm = state.volMolMap();
     for (auto& sp : vm) {
       for (auto& m : sp.second) {
-        double scale = sqrt(4*m->spec()->d()*dt);
+        double scale = sqrt(4*m->spec().d()*dt);
         vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
           scale * state.rng_norm()};
         m->moveTo(disp += m->pos());
