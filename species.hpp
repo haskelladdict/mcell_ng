@@ -12,7 +12,7 @@ class MolSpecies {
 
 public:
 
-  MolSpecies(double D, std::string name, bool is3D = true);
+  MolSpecies(std::string name, double D, bool is3D = true);
 
   double d() const {
     return D_;
