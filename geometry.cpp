@@ -75,7 +75,19 @@ void create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc) {
 }
 
 
+// Region constructor
+Region::Region(std::string name, const Mesh* mesh) : name_{name},
+  parent_mesh_{mesh} {}
 
+
+// member functions for adding mesh elements (triangles) to region
+void Region::add_element(triangleID id) {
+  triangles_.emplace_back(id);
+}
+
+void Region::add_elements(const Vec<triangleID>& ids) {
+  std::copy(ids.begin(), ids.end(), std::back_inserter(triangles_));
+}
 
 
 

@@ -11,6 +11,7 @@
 #include "util.hpp"
 
 
+
 // triangle describes a single triangle on a mesh. It consists of the indexes
 // of the vertices making up the triangle.
 struct Triangle {
@@ -49,6 +50,28 @@ std::ostream& operator<<(std::ostream& os, const Mesh& m);
 
 // helper function for creating a rectangular geometry primitive
 void create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc);
+
+
+using triangleID = std::vector<Triangle>::size_type;
+
+// Region describes a collection of triangles on a Mesh
+class Region {
+
+public:
+
+  Region(std::string name, const Mesh* mesh);
+
+  void add_element(triangleID id);
+  void add_elements(const Vec<triangleID>& ids);
+
+
+private:
+
+  std::string name_;
+  const Mesh* parent_mesh_;
+  Vec<triangleID> triangles_;
+};
+
 
 
 #endif
