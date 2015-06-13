@@ -7,12 +7,12 @@
 #include <memory>
 #include <string>
 
-// MolSpecies describes 2D and 3D species
+// VolMolSpecies describes volume molecules
 class MolSpecies {
 
 public:
 
-  MolSpecies(std::string name, double D, bool is3D = true);
+  MolSpecies(std::string name, double D);
 
   double d() const {
     return D_;
@@ -22,14 +22,9 @@ public:
     return name_;
   }
 
-  bool is3D() const {
-    return is3D_;
-  }
-
 private:
   double D_ = 0.0;       // diffusion coefficient
   std::string name_;     // species name
-  bool is3D_;
 };
 
 using MolSpecPtr = std::unique_ptr<MolSpecies>;

@@ -6,5 +6,4 @@
 
 
 // MolSpecies constructor
-MolSpecies::MolSpecies(std::string name, double D, bool is3D)
-  : D_{D}, name_{name}, is3D_{is3D} {}
+MolSpecies::MolSpecies(std::string name, double D) : D_{D}, name_{name} {}
