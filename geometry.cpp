@@ -7,6 +7,10 @@
 
 #include "geometry.hpp"
 
+
+namespace geometry {
+
+
 // GeomObject constructor
 Mesh::Mesh() {};
 
@@ -25,4 +29,7 @@ void Mesh::add_triangle(int v1, int v2, int v3) {
 
   triangles_.emplace_back(Triangle{v1, v2, v3});
 }
+
+
+}; // end namespace geometry
 

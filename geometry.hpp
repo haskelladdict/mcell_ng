@@ -8,6 +8,7 @@
 
 #include "util.hpp"
 
+namespace geometry {
 
 // triangle describes a single triangle on a mesh. It consists of the indexes
 // of the vertices making up the triangle.
@@ -36,6 +37,9 @@ private:
   Vec<Triangle> triangles_;
 };
 
+using MeshPtr = std::unique_ptr<Mesh>;
 
+
+};  // end namespace geometry
 
 #endif

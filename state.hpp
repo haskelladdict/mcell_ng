@@ -7,12 +7,14 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "geometry.hpp"
 #include "molecules.hpp"
 #include "rng.hpp"
 #include "species.hpp"
 #include "util.hpp"
 
 
+using Meshes = Vec<geometry::MeshPtr>;
 using Species = Vec<MolSpecPtr>;
 using VolMols = Vec<VolMolPtr>;
 using VolMolMap = std::unordered_map<std::string, VolMols>;
@@ -35,12 +37,14 @@ public:
     return rng_.gen();
   }
 
-  const MolSpecies* add_mol_species(std::string name, double D);
-  const MolSpecies* get_mol_species(std::string name) const;
-  bool del_mol_species(const MolSpecies* sp);
+  //const Mesh* create_mesh()
 
-  const VolMol* add_vol_mol(double t, const MolSpecies* spec, const vector3D& pos);
-  bool del_vol_mol(const VolMol* m);
+  const MolSpecies* create_MolSpecies(std::string name, double D);
+  const MolSpecies* get_MolSpecies(std::string name) const;
+  bool del_MolSpecies(const MolSpecies* sp);
+
+  const VolMol* create_VolMol(double t, const MolSpecies* spec, const vector3D& pos);
+  bool del_VolMol(const VolMol* m);
 
   const VolMolMap& volMolMap() {
     return volMolMap_;
@@ -50,6 +54,7 @@ private:
 
   RngNorm rng_;
 
+  Meshes meshes_;
   Species species_;
   VolMolMap volMolMap_;
 };

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include "geometry.hpp"
 #include "io.hpp"
 #include "molecules.hpp"
 #include "rng.hpp"
@@ -20,18 +21,18 @@ int main() {
   double dt = 1e-6;
 
   State state;
-  auto aSpecPtr = state.add_mol_species("A", 600);
+  auto aSpecPtr = state.create_MolSpecies("A", 600);
   for (int i=0; i < 1000; ++i) {
-    state.add_vol_mol(0, aSpecPtr, vector3D{0.0,0.0,0.0});
+    state.create_VolMol(0, aSpecPtr, vector3D{0.0,0.0,0.0});
   }
 
-  auto bSpecPtr = state.add_mol_species("B", 60);
+  auto bSpecPtr = state.create_MolSpecies("B", 60);
   for (int i=0; i < 100; ++i) {
-    state.add_vol_mol(0, bSpecPtr, vector3D{0.0,0.0,0.0});
+    state.create_VolMol(0, bSpecPtr, vector3D{0.0,0.0,0.0});
   }
 
-  //cout << state.del_mol_species(aSpecPtr) << endl;
-  auto p = state.get_mol_species("A");
+  //cout << state.del_MolSpecies(aSpecPtr) << endl;
+  auto p = state.get_MolSpecies("A");
   if (p != nullptr) {
     cout << p->name() << endl;
   } else {
