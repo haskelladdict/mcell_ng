@@ -7,21 +7,27 @@
 #include <ostream>
 #include <vector>
 
-// vector3D represents a 3D vector
-struct vector3D {
+// Vector3D represents a 3D vector
+struct Vector3D {
   double x;
   double y;
   double z;
 };
 
 // operator+ provides vector addition
-vector3D operator+(const vector3D& a, const vector3D& b);
+Vector3D operator+(const Vector3D& a, const Vector3D& b);
 
 // operator+= provides in place vector addition
-vector3D& operator+=(vector3D& a, const vector3D& b);
+Vector3D& operator+=(Vector3D& a, const Vector3D& b);
 
-// provide operator<< for vector3D to help with debugging
-std::ostream& operator<<(std::ostream& os, const vector3D& v);
+// operator- provides vector subtraction
+Vector3D operator-(const Vector3D& a, const Vector3D& b);
+
+// operator-= provides in place vector subtraction
+Vector3D& operator-=(Vector3D& a, const Vector3D& b);
+
+// provide operator<< for Vector3D to help with debugging
+std::ostream& operator<<(std::ostream& os, const Vector3D& v);
 
 
 // range checked vector implementation

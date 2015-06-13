@@ -14,7 +14,7 @@
 #include "util.hpp"
 
 
-using Meshes = Vec<geometry::MeshPtr>;
+using Meshes = Vec<MeshPtr>;
 using Species = Vec<MolSpecPtr>;
 using VolMols = Vec<VolMolPtr>;
 using VolMolMap = std::unordered_map<std::string, VolMols>;
@@ -37,13 +37,13 @@ public:
     return rng_.gen();
   }
 
-  //const Mesh* create_mesh()
+  Mesh* create_Mesh(std::string name);
 
   const MolSpecies* create_MolSpecies(std::string name, double D);
   const MolSpecies* get_MolSpecies(std::string name) const;
   bool del_MolSpecies(const MolSpecies* sp);
 
-  const VolMol* create_VolMol(double t, const MolSpecies* spec, const vector3D& pos);
+  const VolMol* create_VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
   bool del_VolMol(const VolMol* m);
 
   const VolMolMap& volMolMap() {

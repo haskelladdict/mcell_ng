@@ -5,13 +5,13 @@
 
 
 // operator+ provides vector addition
-vector3D operator+(const vector3D& a, const vector3D& b) {
-  return vector3D{a.x + b.x, a.y + b.y, a.z + b.z};
+Vector3D operator+(const Vector3D& a, const Vector3D& b) {
+  return Vector3D{a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
 
 // operator+= provides in place vector addition
-vector3D& operator+=(vector3D& a, const vector3D& b) {
+Vector3D& operator+=(Vector3D& a, const Vector3D& b) {
   a.x += b.x;
   a.y += b.y;
   a.z += b.z;
@@ -19,7 +19,22 @@ vector3D& operator+=(vector3D& a, const vector3D& b) {
 }
 
 
-// provide operator<< for vector3D to help with debugging
-std::ostream& operator<<(std::ostream& os, const vector3D& v) {
+// operator- provides vector subtraction
+Vector3D operator-(const Vector3D& a, const Vector3D& b) {
+  return Vector3D{a.x - b.x, a.y - b.y, a.z - b.z};
+}
+
+
+// operator-= provides in place vector subtraction
+Vector3D& operator-=(Vector3D& a, const Vector3D& b) {
+  a.x -= b.x;
+  a.y -= b.y;
+  a.z -= b.z;
+  return a;
+}
+
+
+// provide operator<< for Vector3D to help with debugging
+std::ostream& operator<<(std::ostream& os, const Vector3D& v) {
   return os << "{" << v.x << "," << v.y << "," << v.z << "}";
 }

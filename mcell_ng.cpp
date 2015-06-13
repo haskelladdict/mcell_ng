@@ -21,14 +21,20 @@ int main() {
   double dt = 1e-6;
 
   State state;
+
+  auto meshPtr = state.create_Mesh("cube");
+  create_rectangle(meshPtr, Vector3D{0.0, 0.0, 0.0}, Vector3D{1.0, 1.0, 1.0});
+  cout << *meshPtr << endl;
+
+
   auto aSpecPtr = state.create_MolSpecies("A", 600);
   for (int i=0; i < 1000; ++i) {
-    state.create_VolMol(0, aSpecPtr, vector3D{0.0,0.0,0.0});
+    state.create_VolMol(0, aSpecPtr, Vector3D{0.0,0.0,0.0});
   }
 
   auto bSpecPtr = state.create_MolSpecies("B", 60);
   for (int i=0; i < 100; ++i) {
-    state.create_VolMol(0, bSpecPtr, vector3D{0.0,0.0,0.0});
+    state.create_VolMol(0, bSpecPtr, Vector3D{0.0,0.0,0.0});
   }
 
   //cout << state.del_MolSpecies(aSpecPtr) << endl;
@@ -44,14 +50,14 @@ int main() {
     std::cerr << "failed to write output" << endl;
   }
   // do a few diffusion steps
-  for (int i=1; i < 100; ++i) {
+  for (int i=1; i < 10; ++i) {
     cout << "iteration:   " << i << endl;
     const VolMolMap& vm = state.volMolMap();
     for (auto& sp : vm) {
       cout << sp.first << endl;
       for (auto& m : sp.second) {
         double scale = sqrt(4*m->spec()->d()*dt);
-        vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
+        Vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
           scale * state.rng_norm()};
         m->moveTo(disp += m->pos());
       }

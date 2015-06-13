@@ -9,7 +9,16 @@
 State::State(uint64_t seed) : rng_{seed} {}
 
 
-// add_MolSpecies adds a molecule species to the simulation
+// create_Mesh adds a new mesh object to the simulation
+Mesh* State::create_Mesh(std::string name) {
+  MeshPtr m = std::make_unique<Mesh>(name);
+  Mesh* mptr = m.get();
+  meshes_.emplace_back(std::move(m));
+  return mptr;
+}
+
+
+// create_MolSpecies adds a molecule species to the simulation
 const MolSpecies* State::create_MolSpecies(std::string name, double D) {
   MolSpecPtr m = std::make_unique<MolSpecies>(name, D);
   MolSpecies* mptr = m.get();
@@ -49,10 +58,10 @@ bool State::del_MolSpecies(const MolSpecies* sp) {
 }
 
 
-// add_vol_mol adds a new volume molecule to the simulation
+// create_VolMol adds a new volume molecule to the simulation
 // NOTE: We keep the molecules separated by species via an unordered_map
 const VolMol* State::create_VolMol(double t, const MolSpecies* spec,
-  const vector3D& pos) {
+  const Vector3D& pos) {
   VolMolPtr m = std::make_unique<VolMol>(t, spec, pos);
   VolMol *vm = m.get();
   auto name = spec->name();
@@ -64,7 +73,7 @@ const VolMol* State::create_VolMol(double t, const MolSpecies* spec,
 }
 
 
-// del_vol_mol removes the provided volume molecule from the simulation
+// del_VolMol removes the provided volume molecule from the simulation
 bool State::del_VolMol(const VolMol* m) {
   VolMols& vm = volMolMap_[m->spec()->name()];
   auto it = std::find_if(vm.begin(), vm.end(), [&](const auto& p) {

@@ -13,11 +13,11 @@ Mol::~Mol() {};
 
 
 // VolMol constructor
-VolMol::VolMol(double t, const MolSpecies* spec, const vector3D& pos)
+VolMol::VolMol(double t, const MolSpecies* spec, const Vector3D& pos)
   : Mol(t, spec), pos_{pos} {}
 
 
 // moveTo moves the volume molecule to a new position
-void VolMol::moveTo(const vector3D& to) {
+void VolMol::moveTo(const Vector3D& to) {
   pos_ = to;
 }

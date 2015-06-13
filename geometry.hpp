@@ -5,10 +5,11 @@
 #define GEOMETRY_HPP
 
 #include <memory>
+#include <ostream>
+#include <string>
 
 #include "util.hpp"
 
-namespace geometry {
 
 // triangle describes a single triangle on a mesh. It consists of the indexes
 // of the vertices making up the triangle.
@@ -25,21 +26,33 @@ class Mesh {
 
 public:
 
-  Mesh();
+  Mesh(std::string name);
 
-  void add_vertex(double x, double y, double z);
+  friend std::ostream& operator<<(std::ostream& os, const Mesh& m);
+
+  void add_vertex(Vector3D&& x);
   void add_triangle(int v1, int v2, int v3);
 
 
 private:
 
-  Vec<vector3D> verts_;
+  std::string name_;
+  Vec<Vector3D> verts_;
   Vec<Triangle> triangles_;
 };
-
 using MeshPtr = std::unique_ptr<Mesh>;
 
 
-};  // end namespace geometry
+// provide operator<< for Mesh for debugging purposes
+std::ostream& operator<<(std::ostream& os, const Mesh& m);
+
+
+// helper function for creating a rectangular geometry primitive
+void create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc);
+
 
 #endif
+
+
+
+

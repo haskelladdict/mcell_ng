@@ -36,17 +36,17 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(double t, const MolSpecies* spec, const vector3D& pos);
+  VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
 
-  const vector3D& pos() const {
+  const Vector3D& pos() const {
     return pos_;
   }
 
-  void moveTo(const vector3D& to);
+  void moveTo(const Vector3D& to);
 
 
 private:
-  vector3D pos_;
+  Vector3D pos_;
 };
 using VolMolPtr = std::unique_ptr<VolMol>;
 
