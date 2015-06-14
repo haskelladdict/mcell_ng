@@ -12,4 +12,4 @@ add_executable(mcell_ng
   io.cpp)
 
 set(CMAKE_CXX_COMPILER "g++-5")
-set(CMAKE_CXX_FLAGS "-O2 -std=c++14")
+set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -std=c++14")

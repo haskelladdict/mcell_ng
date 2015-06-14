@@ -34,10 +34,11 @@ const MolSpecies* State::get_MolSpecies(std::string name) const {
     return p->name() == name;
   });
   if (it == species_.end()) {
-    nullptr;
+    return nullptr;
   }
   return it->get();
 }
+
 
 // del_MolSpecies deletes the given molecule species from the simulation
 // NOTE: This function will also delete all associate molecules from the model

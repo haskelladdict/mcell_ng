@@ -1,8 +1,9 @@
 // Copyright 2015 Markus Dittrich
 // Licensed under BSD license, see LICENSE file for details
 
-#include <iostream>
+#include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -19,13 +20,17 @@ void Mesh::add_vertex(Vector3D&& x) {
 }
 
 
-// add_triangle adds a new triangle among the available vertices of a mesh
-void Mesh::add_triangle(int v1, int v2, int v3) {
-  assert(v1 >= 0 && v1 < verts_.size());
-  assert(v2 >= 0 && v2 < verts_.size());
-  assert(v3 >= 0 && v3 < verts_.size());
+// add_meshElement adds a new triangle among the available vertices of a mesh
+MeshElement* Mesh::add_meshElement(uint64_t v1, uint64_t v2, uint64_t v3,
+  const MeshElementProperty* props) {
 
-  triangles_.emplace_back(Triangle{v1, v2, v3});
+  assert(v1 < verts_.size());
+  assert(v2 < verts_.size());
+  assert(v3 < verts_.size());
+
+  meshElems_.emplace_back(std::make_unique<MeshElement>(MeshElement{v1, v2, v3,
+    *this, props}));
+  return meshElems_.back().get();
 }
 
 
@@ -36,16 +41,49 @@ std::ostream& operator<<(std::ostream& os, const Mesh& m) {
     os << v << "\n";
   }
 
-  os << "\n" << m.triangles_.size() << " Triangles:\n";
-  for (const auto& t : m.triangles_) {
-    os << "{" << t.v1 << "," << t.v2 << "," << t.v3 << "}\n";
+  os << "\n" << m.meshElems_.size() << " Triangles:\n";
+  for (const auto& t : m.meshElems_) {
+    os << "{" << t->v1() << "," << t->v2() << "," << t->v3() << "}\n";
   }
   return os;
 }
 
 
+// MeshElement constructor
+MeshElement::MeshElement(uint64_t v1, uint64_t v2, uint64_t v3,
+  const Mesh& parent, const MeshElementProperty* props) : vert1_{v1}, vert2_{v2},
+    vert3_{v3}, parent_{parent} {
+
+  if (props != nullptr) {
+    props_.emplace_back(props);
+  }
+}
+
+
+// add_meshElementProperty adds a new mesh element property to this mesh element
+void MeshElement::add_meshElementProperty(const MeshElementProperty* prop) {
+  assert(prop != nullptr);
+  props_.emplace_back(prop);
+}
+
+
+// delete_meshElementProperty removes an existing mesh element property from
+// this mesh element. If the removed property did not exist on the mesh element
+// the function returns false and true otherwise.
+bool MeshElement::delete_meshElementProperty(const MeshElementProperty* prop) {
+  assert(prop != nullptr);
+  auto it = std::find(props_.begin(), props_.end(), prop);
+  if (it == props_.end()) {
+    return false;
+  }
+  props_.erase(it);
+  return true;
+}
+
+
 // helper function for creating a rectangular geometry primitive
-void create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc) {
+Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc,
+  const Vector3D& urc) {
 
   // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
   assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
@@ -60,38 +98,20 @@ void create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc) {
   mesh->add_vertex(Vector3D{llc} + Vector3D{0.0, diag.y, diag.z});
   mesh->add_vertex(Vector3D{urc});
 
-  mesh->add_triangle(0,1,5);
-  mesh->add_triangle(0,5,3);
-  mesh->add_triangle(1,4,7);
-  mesh->add_triangle(1,7,5);
-  mesh->add_triangle(4,2,6);
-  mesh->add_triangle(4,6,7);
-  mesh->add_triangle(2,0,3);
-  mesh->add_triangle(2,3,6);
-  mesh->add_triangle(5,7,6);
-  mesh->add_triangle(5,6,3);
-  mesh->add_triangle(0,2,1);
-  mesh->add_triangle(1,2,4);
+  Vec<MeshElement*> elems;
+  elems.emplace_back(mesh->add_meshElement(0,1,5));
+  elems.emplace_back(mesh->add_meshElement(0,5,3));
+  elems.emplace_back(mesh->add_meshElement(1,4,7));
+  elems.emplace_back(mesh->add_meshElement(1,7,5));
+  elems.emplace_back(mesh->add_meshElement(4,2,6));
+  elems.emplace_back(mesh->add_meshElement(4,6,7));
+  elems.emplace_back(mesh->add_meshElement(2,0,3));
+  elems.emplace_back(mesh->add_meshElement(2,3,6));
+  elems.emplace_back(mesh->add_meshElement(5,7,6));
+  elems.emplace_back(mesh->add_meshElement(5,6,3));
+  elems.emplace_back(mesh->add_meshElement(0,2,1));
+  elems.emplace_back(mesh->add_meshElement(1,2,4));
+  return elems;
 }
-
-
-// Region constructor
-Region::Region(std::string name, const Mesh* mesh) : name_{name},
-  parent_mesh_{mesh} {}
-
-
-// member functions for adding mesh elements (triangles) to region
-void Region::add_element(triangleID id) {
-  triangles_.emplace_back(id);
-}
-
-void Region::add_elements(const Vec<triangleID>& ids) {
-  std::copy(ids.begin(), ids.end(), std::back_inserter(triangles_));
-}
-
-
-
-
-
 
 

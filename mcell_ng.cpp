@@ -23,7 +23,11 @@ int main() {
   State state;
 
   auto meshPtr = state.create_Mesh("cube");
-  create_rectangle(meshPtr, Vector3D{0.0, 0.0, 0.0}, Vector3D{1.0, 1.0, 1.0});
+  auto meshElems = create_rectangle(meshPtr, Vector3D{0.0, 0.0, 0.0},
+    Vector3D{1.0, 1.0, 1.0});
+  for (auto& m : meshElems) {
+    //m->add_meshElementProperty(nullptr);
+  }
   cout << *meshPtr << endl;
 
 
@@ -50,7 +54,7 @@ int main() {
     std::cerr << "failed to write output" << endl;
   }
   // do a few diffusion steps
-  for (int i=1; i < 10; ++i) {
+  for (int i=1; i < 2; ++i) {
     cout << "iteration:   " << i << endl;
     const VolMolMap& vm = state.volMolMap();
     for (auto& sp : vm) {
