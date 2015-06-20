@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include "diffuse.hpp"
 #include "geometry.hpp"
 #include "io.hpp"
 #include "molecules.hpp"
@@ -25,11 +26,12 @@ int main() {
   auto meshPtr = state.create_Mesh("cube");
   auto meshElems = create_rectangle(meshPtr, Vector3D{0.0, 0.0, 0.0},
     Vector3D{1.0, 1.0, 1.0});
+#if 0
   for (auto& m : meshElems) {
-    //m->add_meshElementProperty(nullptr);
+    m->add_meshElementProperty(nullptr);
   }
+#endif
   cout << *meshPtr << endl;
-
 
   auto aSpecPtr = state.create_MolSpecies("A", 600);
   for (int i=0; i < 1000; ++i) {
@@ -49,24 +51,25 @@ int main() {
     cout << "molecule species not present" << endl;
   }
 
-  if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
-    "test", 0, state.volMolMap())) {
+
+  if (!write_cellblender(state,
+    "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", 0)) {
     std::cerr << "failed to write output" << endl;
   }
+
   // do a few diffusion steps
-  for (int i=1; i < 2; ++i) {
+  for (int i=1; i < 100; ++i) {
     cout << "iteration:   " << i << endl;
-    const VolMolMap& vm = state.volMolMap();
-    for (auto& sp : vm) {
-      cout << sp.first << endl;
-      for (auto& m : sp.second) {
-        double scale = sqrt(4*m->spec()->d()*dt);
-        Vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
-          scale * state.rng_norm()};
-        m->moveTo(disp += m->pos());
+    auto names = state.get_MolSpeciesNames();
+    for (auto& n : names) {
+      cout << n << endl;
+      for (auto& m : state.get_VolMols(n)) {
+        if (!diffuse(state, m.get(), dt)) {
+          cout << "error diffusing molecule " << m->spec() << endl;
+        }
       }
-      if (!write_cellblender("/Users/markus/programming/cpp/mcell_ng/build/viz_data",
-        "test", i, state.volMolMap())) {
+      if (!write_cellblender(state,
+        "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", i)) {
         std::cerr << "failed to write output" << endl;
       }
     }

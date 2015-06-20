@@ -33,7 +33,7 @@ public:
   State& operator=(State&& s) = delete;
 
   // member functions
-  double rng_norm() {
+  double rng_norm() const {
     return rng_.gen();
   }
 
@@ -41,22 +41,25 @@ public:
 
   const MolSpecies* create_MolSpecies(std::string name, double D);
   const MolSpecies* get_MolSpecies(std::string name) const;
+  Vec<std::string> get_MolSpeciesNames() const {
+    return speciesNames_;
+  }
   bool del_MolSpecies(const MolSpecies* sp);
 
   const VolMol* create_VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
-  bool del_VolMol(const VolMol* m);
-
-  const VolMolMap& volMolMap() {
-    return volMolMap_;
+  const VolMols& get_VolMols(std::string species) const {
+    return volMolMap_.at(species);
   }
+  bool del_VolMol(const VolMol* m);
 
 private:
 
-  RngNorm rng_;
+  mutable RngNorm rng_;
 
   Meshes meshes_;
   Species species_;
   VolMolMap volMolMap_;
+  Vec<std::string> speciesNames_;
 };
 
 #endif

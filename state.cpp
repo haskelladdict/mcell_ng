@@ -2,6 +2,7 @@
 // Licensed under BSD license, see LICENSE file for details
 
 #include <algorithm>
+#include <cassert>
 
 #include "state.hpp"
 
@@ -23,6 +24,7 @@ const MolSpecies* State::create_MolSpecies(std::string name, double D) {
   MolSpecPtr m = std::make_unique<MolSpecies>(name, D);
   MolSpecies* mptr = m.get();
   species_.emplace_back(std::move(m));
+  speciesNames_.emplace_back(name);
   return mptr;
 }
 
@@ -54,6 +56,12 @@ bool State::del_MolSpecies(const MolSpecies* sp) {
   if (volMolMap_.find(sp->name()) != volMolMap_.end()) {
     volMolMap_.erase(sp->name());
   }
+
+  // remove species name
+  auto nit = std::find(speciesNames_.begin(), speciesNames_.end(), sp->name());
+  assert(nit != speciesNames_.end());
+  speciesNames_.erase(nit);
+
   species_.erase(it);
   return true;
 }

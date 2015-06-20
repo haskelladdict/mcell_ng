@@ -13,8 +13,8 @@
 
 // write_cellblender writes the molecule info at iter to a file name in
 // cellblender format located at path.
-bool write_cellblender(std::string path, std::string name, int iter,
-  const VolMolMap& molMap);
+bool write_cellblender(const State& state, std::string path, std::string name,
+  int iter);
 
 
 #endif
