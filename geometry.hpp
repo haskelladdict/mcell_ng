@@ -13,6 +13,12 @@
 #include "util.hpp"
 
 
+// this epsilon is used for geometrical comparison. Anything smaller than that
+// is assumed to be identical.
+// FIXME: This is currently chosen arbitrarily and requires more thinking.
+const double GEOM_EPSILON = 1e-12;
+
+
 // forward declaration
 class Mesh;
 
@@ -40,20 +46,36 @@ class MeshElement{
 
 public:
 
-  MeshElement(uint64_t v1, uint64_t v2, uint64_t v3, const Mesh& parent,
+  MeshElement(uint64_t i0, uint64_t i1, uint64_t i2, const Mesh& parent,
     const MeshElementProperty* prop = nullptr);
 
-  uint64_t v1() const {
+  uint64_t i0() const {
+    return vert0_;
+  }
+
+  uint64_t i1() const {
     return vert1_;
   }
 
-  uint64_t v2() const {
+  uint64_t i2() const {
     return vert2_;
   }
 
-  uint64_t v3() const {
-    return vert3_;
+  const Vector3D& u() const {
+    return u_;
   }
+
+  const Vector3D& v() const {
+    return v_;
+  }
+
+  const Vector3D& n() const {
+    return normal_;
+  }
+
+  const Vector3D& v0() const;
+  const Vector3D& v1() const;
+  const Vector3D& v2() const;
 
   void add_meshElementProperty(const MeshElementProperty* prop);
   bool delete_meshElementProperty(const MeshElementProperty* prop);
@@ -61,10 +83,13 @@ public:
 
 private:
 
+  uint64_t vert0_;
   uint64_t vert1_;
   uint64_t vert2_;
-  uint64_t vert3_;
-  const Mesh& parent_;         // reference to parent mesh
+  Vector3D u_;          // triangle vectors
+  Vector3D v_;
+  Vector3D normal_;     // normal vector
+  const Mesh& mesh_;  // reference to parent mesh
   Vec<const MeshElementProperty*> props_;
 };
 using MeshElementPtr = std::unique_ptr<MeshElement>;
@@ -81,7 +106,12 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Mesh& m);
 
   void add_vertex(Vector3D&& x);
-  MeshElement* add_meshElement(uint64_t v1, uint64_t v2, uint64_t v3,
+
+  const Vector3D& get_vertex(size_t i) const {
+    return verts_[i];
+  }
+
+  MeshElement* add_meshElement(uint64_t i0, uint64_t i1, uint64_t i2,
     const MeshElementProperty* props = nullptr);
 
   MeshElement* get_meshElement(size_t i) const {
@@ -108,6 +138,15 @@ std::ostream& operator<<(std::ostream& os, const Mesh& m);
 // returns a vector with pointers to all MeshElements.
 Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc);
 
+
+// intersect tests for ray triangle intersections. Possible return values are
+//  0: triangle and ray intersect, in this case hitPoint contains the location of
+//     the intersection point
+//  1: triangle and ray do not intersect
+//  2: ray and triangle are co-planar
+//  3: triangle is degenerate
+int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
+  Vector3D* hitPoint);
 
 #endif
 

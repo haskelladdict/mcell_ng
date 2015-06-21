@@ -26,8 +26,16 @@ Vector3D operator-(const Vector3D& a, const Vector3D& b);
 // operator-= provides in place vector subtraction
 Vector3D& operator-=(Vector3D& a, const Vector3D& b);
 
-// provide operator<< for Vector3D to help with debugging
+// operator<< for Vector3D is intended mostly to help with debugging
 std::ostream& operator<<(std::ostream& os, const Vector3D& v);
+
+// operator* implements a dot product between two Vector3Ds
+// and a scalar multiplication between a Vector3D and a double
+double operator*(const Vector3D& a, const Vector3D& b);
+Vector3D operator*(double r, const Vector3D& a);
+
+// cross provides a cross product between two Vector3Ds
+Vector3D cross(const Vector3D& a, const Vector3D& b);
 
 
 // range checked vector implementation
@@ -45,5 +53,10 @@ public:
     return std::vector<T>::at(i);
   }
 };
+
+
+// same compares two floating point values for equality
+bool same(double x, double y);
+
 
 #endif
