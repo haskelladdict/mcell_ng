@@ -17,7 +17,7 @@
 // is assumed to be identical.
 // FIXME: This is currently chosen arbitrarily and requires more thinking.
 const double GEOM_EPSILON = 1e-12;
-
+const double GEOM_EPSILON_2 = 1e-24;
 
 // forward declaration
 class Mesh;
@@ -49,6 +49,7 @@ public:
   MeshElement(uint64_t i0, uint64_t i1, uint64_t i2, const Mesh& parent,
     const MeshElementProperty* prop = nullptr);
 
+  // indices of this MeshElement vertices in Mesh's vertex list
   uint64_t i0() const {
     return vert0_;
   }
@@ -61,6 +62,7 @@ public:
     return vert2_;
   }
 
+  // coordinate vectors of MeshElement: u, v and n
   const Vector3D& u() const {
     return u_;
   }
@@ -73,6 +75,12 @@ public:
     return normal_;
   }
 
+  // normalized normal vector
+  const Vector3D& n_norm() const {
+    return normal_norm_;
+  }
+
+  // coordinates MeshElement vertices
   const Vector3D& v0() const;
   const Vector3D& v1() const;
   const Vector3D& v2() const;
@@ -86,14 +94,15 @@ private:
   uint64_t vert0_;
   uint64_t vert1_;
   uint64_t vert2_;
-  Vector3D u_;          // triangle vectors
+  Vector3D u_;           // triangle vectors
   Vector3D v_;
-  Vector3D normal_;     // normal vector
-  const Mesh& mesh_;  // reference to parent mesh
+  Vector3D normal_;      // normal vector
+  Vector3D normal_norm_; // normalized normal vector - precomputed for efficiency
+  const Mesh& mesh_;     // reference to parent mesh
   Vec<const MeshElementProperty*> props_;
 };
 using MeshElementPtr = std::unique_ptr<MeshElement>;
-
+using MeshElements = Vec<MeshElementPtr>;
 
 // Mesh describes a contiguous (closed or open) surface consisting of
 // a collection of vertices and triangular connections between them.
@@ -118,6 +127,12 @@ public:
     return meshElems_[i].get();
   }
 
+  const MeshElements& get_meshElements() const {
+    return meshElems_;
+  }
+
+  const
+
   auto num_meshElements() const {
     return meshElems_.size();
   }
@@ -127,7 +142,7 @@ private:
 
   std::string name_;
   Vec<Vector3D> verts_;
-  Vec<MeshElementPtr> meshElems_;
+  MeshElements meshElems_;
 };
 using MeshPtr = std::unique_ptr<Mesh>;
 
@@ -138,13 +153,13 @@ std::ostream& operator<<(std::ostream& os, const Mesh& m);
 // returns a vector with pointers to all MeshElements.
 Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc);
 
-
 // intersect tests for ray triangle intersections. Possible return values are
-//  0: triangle and ray intersect, in this case hitPoint contains the location of
-//     the intersection point
-//  1: triangle and ray do not intersect
-//  2: ray and triangle are co-planar
-//  3: triangle is degenerate
+//  0: triangle and ray segment intersect, in this case hitPoint contains the
+//     location of the intersection point
+//  1: triangle and ray intersect but ray segment does not reach the triangle
+//  2: triangle and ray do not intersect
+//  3: ray and triangle are co-planar
+//  4: triangle is degenerate
 int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
   Vector3D* hitPoint);
 

@@ -57,7 +57,13 @@ Vector3D operator*(double r, const Vector3D& a) {
 // cross provides a cross product between two Vector3Ds
 Vector3D cross(const Vector3D& a, const Vector3D& b) {
   return Vector3D{ (a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z),
-    (a.x * b.y) - (a.y - b.x)};
+    (a.x * b.y) - (a.y * b.x)};
+}
+
+
+// normalize returns a normalized version of the supplied vector
+Vector3D normalize(const Vector3D& a) {
+  return (1 / a.norm()) * a;
 }
 
 

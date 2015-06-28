@@ -24,8 +24,8 @@ int main() {
   State state;
 
   auto meshPtr = state.create_Mesh("cube");
-  auto meshElems = create_rectangle(meshPtr, Vector3D{0.0, 0.0, 0.0},
-    Vector3D{1.0, 1.0, 1.0});
+  auto meshElems = create_rectangle(meshPtr, Vector3D{-0.1, -0.1, -0.1},
+    Vector3D{0.1, 0.1, 0.1});
 #if 0
   for (auto& m : meshElems) {
     m->add_meshElementProperty(nullptr);
@@ -34,15 +34,15 @@ int main() {
   cout << *meshPtr << endl;
 
   auto aSpecPtr = state.create_MolSpecies("A", 600);
-  for (int i=0; i < 1000; ++i) {
+  for (int i=0; i < 10000; ++i) {
     state.create_VolMol(0, aSpecPtr, Vector3D{0.0,0.0,0.0});
   }
-
+/*
   auto bSpecPtr = state.create_MolSpecies("B", 60);
   for (int i=0; i < 100; ++i) {
     state.create_VolMol(0, bSpecPtr, Vector3D{0.0,0.0,0.0});
   }
-
+*/
   //cout << state.del_MolSpecies(aSpecPtr) << endl;
   auto p = state.get_MolSpecies("A");
   if (p != nullptr) {
@@ -58,7 +58,7 @@ int main() {
   }
 
   // do a few diffusion steps
-  for (int i=1; i < 100; ++i) {
+  for (int i=1; i < 10000; ++i) {
     cout << "iteration:   " << i << endl;
     auto names = state.get_MolSpeciesNames();
     for (auto& n : names) {
@@ -68,9 +68,11 @@ int main() {
           cout << "error diffusing molecule " << m->spec() << endl;
         }
       }
-      if (!write_cellblender(state,
-        "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", i)) {
-        std::cerr << "failed to write output" << endl;
+      if (i % 100 == 0) {
+        if (!write_cellblender(state,
+          "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", i)) {
+          std::cerr << "failed to write output" << endl;
+        }
       }
     }
   }

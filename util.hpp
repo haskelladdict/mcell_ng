@@ -4,6 +4,7 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include <cmath>
 #include <ostream>
 #include <vector>
 
@@ -12,6 +13,16 @@ struct Vector3D {
   double x;
   double y;
   double z;
+
+  // squared vector norm
+  double norm2() const {
+    return x*x + y*y + z*z;
+  }
+
+  // vector norm
+  double norm() const {
+    return sqrt(norm2());
+  }
 };
 
 // operator+ provides vector addition
@@ -36,6 +47,9 @@ Vector3D operator*(double r, const Vector3D& a);
 
 // cross provides a cross product between two Vector3Ds
 Vector3D cross(const Vector3D& a, const Vector3D& b);
+
+// normalize returns a normalized version of the supplied vector
+Vector3D normalize(const Vector3D& a);
 
 
 // range checked vector implementation

@@ -58,6 +58,7 @@ MeshElement::MeshElement(uint64_t i0, uint64_t i1, uint64_t i2, const Mesh& pare
   u_ = mesh_.get_vertex(i1) - mesh_.get_vertex(i0);
   v_ = mesh_.get_vertex(i2) - mesh_.get_vertex(i0);
   normal_ = cross(u_, v_);
+  normal_norm_ = normalize(normal_);
 
   if (props != nullptr) {
     props_.emplace_back(props);
@@ -87,15 +88,15 @@ bool MeshElement::delete_meshElementProperty(const MeshElementProperty* prop) {
 
 
 // v0, v1, v2 return the locations of vertex 0 through 2 as Vector3Ds
-inline const Vector3D& MeshElement::v0() const {
+const Vector3D& MeshElement::v0() const {
   return mesh_.get_vertex(vert0_);
 }
 
-inline const Vector3D& MeshElement::v1() const {
+const Vector3D& MeshElement::v1() const {
   return mesh_.get_vertex(vert1_);
 }
 
-inline const Vector3D& MeshElement::v2() const {
+const Vector3D& MeshElement::v2() const {
   return mesh_.get_vertex(vert2_);
 }
 
@@ -135,11 +136,12 @@ Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc,
 
 
 // intersect tests for ray triangle intersections. Possible return values are
-//  0: triangle and ray intersect, in this case hitPoint contains the location of
-//     the intersection point
-//  1: triangle and ray do not intersect
-//  2: ray and triangle are co-planar
-//  3: triangle is degenerate
+//  0: triangle and ray segment intersect, in this case hitPoint contains the
+//     location of the intersection point
+//  1: triangle and ray intersect but ray segment does not reach the triangle
+//  2: triangle and ray do not intersect
+//  3: ray and triangle are co-planar
+//  4: triangle is degenerate
 //
 // NOTE: This function was adapted from Dan Sunday
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
@@ -148,7 +150,7 @@ int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
 
   // if the normal vector is zero triangle is degenerate
   if (same(m->n().x, 0.0) && same(m->n().y, 0.0) && same(m->n().z, 0.0)) {
-    return 3;
+    return 4;
   }
 
   // compute intersection of ray from p0 along disp with plane in which m is
@@ -158,14 +160,16 @@ int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
   double b = m->n() * disp;
   if (fabs(b) < GEOM_EPSILON) {  // our ray is parallel to triangle plane
     if (same(a, 0.0)) { // our ray is coplanar with the triangle
-      return 2;
+      return 3;
     } else {
-      return 1;
+      return 2;
     }
   }
 
   double r = a / b;
   if (r < 0) {  // if ray points away from triangle plane we won't hit it
+    return 2;
+  } else if (r > 1) {  // if the ray segment doesn't reach the plane we won't hit it
     return 1;
   }
   *hitPoint = p0 + r * disp;
@@ -185,11 +189,11 @@ int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
   // compute and test parametric coords
   double s = (uv * wv - vv * wu) / D;
   if (s < 0.0 || s > 1.0) {        // hitPoint is outside m
-    return 1;
+    return 2;
   }
   double t = (uv * wu - uu * wv) / D;
   if (t < 0.0 || (s + t) > 1.0) { // hitPoint is outside m
-    return 1;
+    return 2;
   }
   return 0;  // hitPoint is in m
 }

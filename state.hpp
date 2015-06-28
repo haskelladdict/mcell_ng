@@ -37,8 +37,13 @@ public:
     return rng_.gen();
   }
 
+  // mesh related functionality
   Mesh* create_Mesh(std::string name);
+  const Meshes& get_Meshes() const {
+    return meshes_;
+  }
 
+  // species related functionality
   const MolSpecies* create_MolSpecies(std::string name, double D);
   const MolSpecies* get_MolSpecies(std::string name) const;
   Vec<std::string> get_MolSpeciesNames() const {
@@ -46,6 +51,7 @@ public:
   }
   bool del_MolSpecies(const MolSpecies* sp);
 
+  // molecule related functionality
   const VolMol* create_VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
   const VolMols& get_VolMols(std::string species) const {
     return volMolMap_.at(species);
