@@ -4,10 +4,12 @@
 #ifndef SPECIES_HPP
 #define SPECIES_HPP
 
-#include <memory>
 #include <string>
 
-// VolMolSpecies describes volume molecules
+#include "util.hpp"
+
+
+// MolSpecies describes molecule species
 class MolSpecies {
 
 public:
@@ -27,6 +29,35 @@ private:
   std::string name_;     // species name
 };
 
-using MolSpecPtr = std::unique_ptr<MolSpecies>;
+
+// SpeciesContainer keeps track of all defined/active MolSpecies
+class SpeciesContainer {
+
+public:
+
+  SpeciesContainer() {};
+
+
+  long create(std::string name, double D);
+  bool erase(long ID);
+
+  long size() const {
+    return species_.size();
+  }
+
+  const MolSpecies& by_ID(long ID) const;
+  const MolSpecies& by_name(const std::string &name) const;
+
+  long id(const MolSpecies& spec) const;
+
+
+private:
+
+  Vec<MolSpecies> species_;
+};
+
+
+
+
 
 #endif

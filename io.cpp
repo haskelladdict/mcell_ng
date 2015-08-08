@@ -15,13 +15,12 @@
 
 // write_cellblender writes the molecule info at iter to a file name in
 // cellblender format located at path.
-bool write_cellblender(const State& state, std::string path, std::string name,
+bool write_cellblender(State& state, std::string path, std::string name,
   int iter) {
 
-  if (state.get_MolSpeciesNames().size() == 0) {
+  if (state.species().size() == 0) {
     return false;
   }
-
 
   char fileName[256];
   if (snprintf(fileName, 255, "%s/%s.cellbin.%04d.dat", path.c_str(),
@@ -38,23 +37,24 @@ bool write_cellblender(const State& state, std::string path, std::string name,
   out.write(reinterpret_cast<char*>(&version), sizeof(uint32_t));
 
   // write molecule info
-  for (const auto& name : state.get_MolSpeciesNames()) {
-    unsigned char length = name.length();
+  for (long i=0; i < state.species().size(); ++i) {
+    auto spec = state.species().by_ID(i);
+    unsigned char length = spec.name().length();
     out.write(reinterpret_cast<char*>(&length), sizeof(length));
-    out.write(name.c_str(), length*sizeof(char));
+    out.write(spec.name().c_str(), length*sizeof(char));
 
     unsigned char type = 0;   // 0 indicated volume molecules
     out.write(reinterpret_cast<char*>(&type), sizeof(type));
 
-    const auto& mols = state.get_VolMols(name);
+    auto& mols = state.volMols().by_ID(i);
     unsigned int numMols = 3 * mols.size();
     out.write(reinterpret_cast<char*>(&numMols), sizeof(numMols));
     for (const auto& m : mols) {
-      float mposx = m->pos().x;
+      float mposx = m.pos().x;
       out.write(reinterpret_cast<char*>(&mposx), sizeof(mposx));
-      float mposy = m->pos().y;
+      float mposy = m.pos().y;
       out.write(reinterpret_cast<char*>(&mposy), sizeof(mposy));
-      float mposz = m->pos().z;
+      float mposz = m.pos().z;
       out.write(reinterpret_cast<char*>(&mposz), sizeof(mposz));
     }
   }

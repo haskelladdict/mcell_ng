@@ -15,9 +15,6 @@
 
 
 using Meshes = Vec<MeshPtr>;
-using Species = Vec<MolSpecPtr>;
-using VolMols = Vec<VolMolPtr>;
-using VolMolMap = std::unordered_map<std::string, VolMols>;
 
 
 class State {
@@ -43,29 +40,21 @@ public:
     return meshes_;
   }
 
-  // species related functionality
-  const MolSpecies* create_MolSpecies(std::string name, double D);
-  const MolSpecies* get_MolSpecies(std::string name) const;
-  Vec<std::string> get_MolSpeciesNames() const {
-    return speciesNames_;
+  SpeciesContainer& species() {
+    return species_;
   }
-  bool del_MolSpecies(const MolSpecies* sp);
 
-  // molecule related functionality
-  const VolMol* create_VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
-  const VolMols& get_VolMols(std::string species) const {
-    return volMolMap_.at(species);
+  VolMolMap& volMols() {
+    return volMolMap_;
   }
-  bool del_VolMol(const VolMol* m);
 
 private:
 
   mutable RngNorm rng_;
 
   Meshes meshes_;
-  Species species_;
+  SpeciesContainer species_;
   VolMolMap volMolMap_;
-  Vec<std::string> speciesNames_;
 };
 
 #endif

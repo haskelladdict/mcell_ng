@@ -13,7 +13,7 @@
 
 // write_cellblender writes the molecule info at iter to a file name in
 // cellblender format located at path.
-bool write_cellblender(const State& state, std::string path, std::string name,
+bool write_cellblender(State& state, std::string path, std::string name,
   int iter);
 
 

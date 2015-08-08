@@ -7,7 +7,7 @@
 #include "state.hpp"
 
 
-bool diffuse(const State& state, VolMol* m, double dt);
+bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt);
 
 
 #endif

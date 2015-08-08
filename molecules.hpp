@@ -5,6 +5,7 @@
 #define MOLECULES_HPP
 
 #include <memory>
+#include <unordered_map>
 
 #include "species.hpp"
 #include "util.hpp"
@@ -13,21 +14,22 @@
 class Mol {
 
 public:
-  Mol(double t, const MolSpecies* spec);
+  Mol(double t, long specID);
   virtual ~Mol() = 0;
+
 
   double t() const {
     return t_;
   }
 
-  const MolSpecies* spec() const {
-    return spec_;
+  long specID() const {
+    return specID_;
   }
 
 
 private:
-  double t_;               // birthday
-  const MolSpecies* spec_; // what species are we
+  double t_;     // birthday
+  long specID_;  // what species are we
 };
 
 
@@ -36,7 +38,7 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(double t, const MolSpecies* spec, const Vector3D& pos);
+  VolMol(double t, long specID, const Vector3D& pos);
 
   const Vector3D& pos() const {
     return pos_;
@@ -48,7 +50,28 @@ public:
 private:
   Vector3D pos_;
 };
-using VolMolPtr = std::unique_ptr<VolMol>;
+
+using VolMolContainer = Vec<VolMol>;
+
+
+// VolMolMap holds all molecules in the simulation organized by species id
+class VolMolMap {
+
+public:
+
+  VolMol& create(long specID, double t, const Vector3D& pos);
+  bool del(VolMol& mol);
+
+  VolMolContainer& by_ID(long specID);
+
+
+private:
+
+  std::unordered_map<long, VolMolContainer> volMolMap_;
+};
+
+
+
 
 
 #endif

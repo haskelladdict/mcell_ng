@@ -10,12 +10,12 @@
 #include "util.hpp"
 
 
-int collide(const State& state, VolMol* mol, Vector3D& disp) {
+int collide(const State& state, VolMol& mol, Vector3D& disp) {
   for (const auto& mesh : state.get_Meshes()) {
     for (const auto& m : mesh->get_meshElements()) {
       Vector3D hitPoint;
-      if (intersect(mol->pos(), disp, m.get(), &hitPoint) == 0) {
-        Vector3D disp_rem = hitPoint - mol->pos();
+      if (intersect(mol.pos(), disp, m.get(), &hitPoint) == 0) {
+        Vector3D disp_rem = hitPoint - mol.pos();
 
         // reflect: Rr = Ri - 2 N (Ri * N)
         disp = disp_rem - (2 * (disp_rem * m->n_norm())) * m->n_norm();
@@ -33,7 +33,7 @@ int collide(const State& state, VolMol* mol, Vector3D& disp) {
           double side = (disp_rem * m->n_norm()) > 0 ? -1 : 1;
           hitPoint += side * GEOM_EPSILON * m->n_norm();
         }
-        mol->moveTo(hitPoint);
+        mol.moveTo(hitPoint);
         return 1;
       }
     }
@@ -42,20 +42,20 @@ int collide(const State& state, VolMol* mol, Vector3D& disp) {
 }
 
 
-bool diffuse(const State& state, VolMol* mol, double dt) {
+bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 
   // compute displacement
-  double scale = sqrt(4*mol->spec()->d()*dt);
+  double scale = sqrt(4*spec.d()*dt);
   Vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
     scale * state.rng_norm()};
 
   // diffuse and collide until we're at the end of our diffusion step
   while (collide(state, mol, disp)) {}
   if (disp.norm2() > 0) {
-    mol->moveTo(mol->pos() + disp);
+    mol.moveTo(mol.pos() + disp);
   }
-  assert(mol->pos().x > -0.2 && mol->pos().x < 0.2);
-  assert(mol->pos().y > -0.2 && mol->pos().y < 0.2);
-  assert(mol->pos().z > -0.2 && mol->pos().z < 0.2);
+  assert(mol.pos().x > -0.2 && mol.pos().x < 0.2);
+  assert(mol.pos().y > -0.2 && mol.pos().y < 0.2);
+  assert(mol.pos().z > -0.2 && mol.pos().z < 0.2);
   return true;
 }
