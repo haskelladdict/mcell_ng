@@ -9,13 +9,15 @@
 
 
 // MolSpecies constructor
-MolSpecies::MolSpecies(std::string name, double D) : D_{D}, name_{name} {}
+MolSpecies::MolSpecies(std::string name, long id, double d)
+  : d_{d}, id_(id), name_{name} {}
 
 
 // create adds a molecule species to the simulation
-long SpeciesContainer::create(std::string name, double D) {
-  species_.emplace_back(MolSpecies(name, D));
-  return species_.size()-1;
+long SpeciesContainer::create(std::string name, double d) {
+  long speciesID = species_.size();
+  species_.emplace_back(MolSpecies(name, speciesID, d));
+  return speciesID;
 }
 
 
@@ -32,28 +34,15 @@ const MolSpecies& SpeciesContainer::by_name(const std::string& name) const {
 
 
 // by_ID returns a const ref to the species instance corresponding to ID
-const MolSpecies& SpeciesContainer::by_ID(long ID) const {
-  assert(ID < static_cast<long>(species_.size()));
-  return species_[ID];
+const MolSpecies& SpeciesContainer::by_ID(long id) const {
+  assert(id < static_cast<long>(species_.size()));
+  return species_[id];
 }
 
 
 // del deletes the given species from the simulation
-bool SpeciesContainer::erase(long ID) {
-  assert (ID < static_cast<long>(species_.size()));
-  species_.erase(species_.begin() + ID);
+bool SpeciesContainer::erase(long id) {
+  assert (id < static_cast<long>(species_.size()));
+  species_.erase(species_.begin() + id);
   return true;
 }
-
-
-// id returns the species id for the given molecular species
-long SpeciesContainer::spec_to_ID(const MolSpecies& spec) const {
-  auto it = std::find_if(species_.begin(), species_.end(), [&spec] (const auto& p) {
-    return &p == &spec;
-  });
-  if (it == species_.end()) {
-    throw;
-  }
-  return std::distance(species_.begin(), it);
-}
-

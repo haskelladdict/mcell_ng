@@ -50,7 +50,6 @@ public:
 private:
   Vector3D pos_;
 };
-
 using VolMolContainer = Vec<VolMol>;
 
 
@@ -59,18 +58,20 @@ class VolMolMap {
 
 public:
 
+  using mapped_type = std::unordered_map<long, VolMolContainer>::mapped_type;
+
   VolMol& create(long specID, double t, const Vector3D& pos);
   bool del(VolMol& mol);
 
-  VolMolContainer& by_ID(long specID);
+  mapped_type& operator[](long ID) {
+    return volMolMap_[ID];
+  }
 
 
 private:
 
   std::unordered_map<long, VolMolContainer> volMolMap_;
 };
-
-
 
 
 

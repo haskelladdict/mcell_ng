@@ -14,18 +14,24 @@ class MolSpecies {
 
 public:
 
-  MolSpecies(std::string name, double D);
+  MolSpecies(std::string name, long id, double d);
 
-  double d() const {
-    return D_;
+  double D() const {
+    return d_;
   }
 
   std::string name() const {
     return name_;
   }
 
+  long ID() const {
+    return id_;
+  }
+
+
 private:
-  double D_ = 0.0;       // diffusion coefficient
+  double d_ = 0.0;       // diffusion coefficient
+  long id_;              // species id
   std::string name_;     // species name
 };
 
@@ -65,8 +71,6 @@ public:
 
   const MolSpecies& by_ID(long ID) const;
   const MolSpecies& by_name(const std::string &name) const;
-
-  long spec_to_ID(const MolSpecies& spec) const;
 
 
 private:

@@ -50,10 +50,3 @@ bool VolMolMap::del(VolMol& mol) {
   }
   return false;
 }
-
-
-// byID returns a VolMolContainer with all molecules of specID;
-VolMolContainer& VolMolMap::by_ID(long specID) {
-  return volMolMap_.at(specID);
-}
-

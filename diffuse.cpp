@@ -45,7 +45,7 @@ int collide(const State& state, VolMol& mol, Vector3D& disp) {
 bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 
   // compute displacement
-  double scale = sqrt(4*spec.d()*dt);
+  double scale = sqrt(4*spec.D()*dt);
   Vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
     scale * state.rng_norm()};
 

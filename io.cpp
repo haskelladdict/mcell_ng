@@ -45,8 +45,7 @@ bool write_cellblender(State& state, std::string path, std::string name,
     unsigned char type = 0;   // 0 indicates volume molecules
     out.write(reinterpret_cast<char*>(&type), sizeof(type));
 
-    long id = state.species().spec_to_ID(spec);
-    auto& mols = state.volMols().by_ID(id);
+    auto& mols = state.volMols()[spec.ID()];
     unsigned int numMols = 3 * mols.size();
     out.write(reinterpret_cast<char*>(&numMols), sizeof(numMols));
     for (const auto& m : mols) {

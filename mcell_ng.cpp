@@ -43,14 +43,13 @@ int main() {
   for (int i=1; i < 1000; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
-      long id = state.species().spec_to_ID(spec);
-      for (auto& m : state.volMols().by_ID(id)) {
+      for (auto& m : state.volMols()[spec.ID()]) {
         if (!diffuse(state, spec, m, dt)) {
           cout << "error diffusing molecule " << spec.name() << endl;
         }
       }
     }
-    if (i % 100 == 0) {
+    if (i % 10 == 0) {
       if (!write_cellblender(state,
         "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", i)) {
         std::cerr << "failed to write output" << endl;
