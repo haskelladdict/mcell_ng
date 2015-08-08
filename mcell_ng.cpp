@@ -29,10 +29,13 @@ int main() {
 
   auto aID = state.species().create("A", 600);
   for (int i=0; i < 10000; ++i) {
-    state.volMols().create(aID, 0, Vector3D{0.0,0.0,0.0});
+    state.volMols().create(aID, Vector3D{0.0,0.0,0.0});
   }
-  auto p = state.species().by_name("A");
-  cout << p.name() << endl;
+
+  auto bID = state.species().create("B", 900);
+  for (int i=0; i < 12000; ++i) {
+    state.volMols().create(bID, Vector3D{0.05,0.05,0.05});
+  }
 
   if (!write_cellblender(state,
     "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", 0)) {

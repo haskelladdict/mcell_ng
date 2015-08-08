@@ -14,7 +14,7 @@
 class Mol {
 
 public:
-  Mol(double t, long specID);
+  Mol(long specID, double t);
   virtual ~Mol() = 0;
 
 
@@ -28,8 +28,8 @@ public:
 
 
 private:
-  double t_;     // birthday
   long specID_;  // what species are we
+  double t_;     // birthday
 };
 
 
@@ -38,7 +38,7 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(double t, long specID, const Vector3D& pos);
+  VolMol(long specID, const Vector3D& pos, double t);
 
   const Vector3D& pos() const {
     return pos_;
@@ -60,7 +60,7 @@ public:
 
   using mapped_type = std::unordered_map<long, VolMolContainer>::mapped_type;
 
-  VolMol& create(long specID, double t, const Vector3D& pos);
+  VolMol& create(long specID, const Vector3D& pos, double t = 0.0);
   bool del(VolMol& mol);
 
   mapped_type& operator[](long ID) {

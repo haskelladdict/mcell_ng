@@ -54,8 +54,5 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
   if (disp.norm2() > 0) {
     mol.moveTo(mol.pos() + disp);
   }
-  assert(mol.pos().x > -0.2 && mol.pos().x < 0.2);
-  assert(mol.pos().y > -0.2 && mol.pos().y < 0.2);
-  assert(mol.pos().z > -0.2 && mol.pos().z < 0.2);
   return true;
 }
