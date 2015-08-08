@@ -26,30 +26,13 @@ int main() {
   auto meshPtr = state.create_Mesh("cube");
   auto meshElems = create_rectangle(meshPtr, Vector3D{-0.1, -0.1, -0.1},
     Vector3D{0.1, 0.1, 0.1});
-#if 0
-  for (auto& m : meshElems) {
-    m->add_meshElementProperty(nullptr);
-  }
-#endif
-  cout << *meshPtr << endl;
 
   auto aID = state.species().create("A", 600);
   for (int i=0; i < 10000; ++i) {
     state.volMols().create(aID, 0, Vector3D{0.0,0.0,0.0});
   }
-/*
-  auto bSpecPtr = state.create_MolSpecies("B", 60);
-  for (int i=0; i < 100; ++i) {
-    state.create_VolMol(0, bSpecPtr, Vector3D{0.0,0.0,0.0});
-  }
-*/
-  //cout << state.del_MolSpecies(aSpecPtr) << endl;
   auto p = state.species().by_name("A");
-  //if (p != nullptr) {
   cout << p.name() << endl;
-  //} else {
-  //  cout << "molecule species not present" << endl;
-  //}
 
   if (!write_cellblender(state,
     "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", 0)) {
@@ -59,11 +42,9 @@ int main() {
   // do a few diffusion steps
   for (int i=1; i < 1000; ++i) {
     cout << "iteration:   " << i << endl;
-    auto species = state.species();
-    for (long s=0; s < species.size(); ++s) {
-      auto& spec = species.by_ID(s);
-      cout << spec.name() << endl;
-      for (auto& m : state.volMols().by_ID(s)) {
+    for (auto& spec : state.species()) {
+      long id = state.species().spec_to_ID(spec);
+      for (auto& m : state.volMols().by_ID(id)) {
         if (!diffuse(state, spec, m, dt)) {
           cout << "error diffusing molecule " << spec.name() << endl;
         }

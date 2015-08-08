@@ -33,21 +33,21 @@ const MolSpecies& SpeciesContainer::by_name(const std::string& name) const {
 
 // by_ID returns a const ref to the species instance corresponding to ID
 const MolSpecies& SpeciesContainer::by_ID(long ID) const {
-  assert(ID < species_.size());
+  assert(ID < static_cast<long>(species_.size()));
   return species_[ID];
 }
 
 
 // del deletes the given species from the simulation
 bool SpeciesContainer::erase(long ID) {
-  assert (ID < species_.size());
+  assert (ID < static_cast<long>(species_.size()));
   species_.erase(species_.begin() + ID);
   return true;
 }
 
 
 // id returns the species id for the given molecular species
-long SpeciesContainer::id(const MolSpecies& spec) const {
+long SpeciesContainer::spec_to_ID(const MolSpecies& spec) const {
   auto it = std::find_if(species_.begin(), species_.end(), [&spec] (const auto& p) {
     return &p == &spec;
   });

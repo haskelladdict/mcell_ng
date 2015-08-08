@@ -35,8 +35,10 @@ class SpeciesContainer {
 
 public:
 
-  SpeciesContainer() {};
+  using iterator = Vec<MolSpecies>::iterator;
+  using const_iterator = Vec<MolSpecies>::const_iterator;
 
+  SpeciesContainer() {};
 
   long create(std::string name, double D);
   bool erase(long ID);
@@ -45,10 +47,26 @@ public:
     return species_.size();
   }
 
+  iterator begin() {
+    return species_.begin();
+  }
+
+  const_iterator begin() const {
+    return species_.begin();
+  }
+
+  iterator end() {
+    return species_.end();
+  }
+
+  const_iterator end() const {
+    return species_.end();
+  }
+
   const MolSpecies& by_ID(long ID) const;
   const MolSpecies& by_name(const std::string &name) const;
 
-  long id(const MolSpecies& spec) const;
+  long spec_to_ID(const MolSpecies& spec) const;
 
 
 private:
