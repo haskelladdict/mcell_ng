@@ -10,12 +10,12 @@
 #include "util.hpp"
 
 
-int collide(const State& state, VolMol& mol, Vector3D& disp) {
+int collide(const State& state, VolMol& mol, Vec3& disp) {
   for (const auto& mesh : state.get_Meshes()) {
     for (const auto& m : mesh->get_meshElements()) {
-      Vector3D hitPoint;
+      Vec3 hitPoint;
       if (intersect(mol.pos(), disp, m.get(), &hitPoint) == 0) {
-        Vector3D disp_rem = hitPoint - mol.pos();
+        Vec3 disp_rem = hitPoint - mol.pos();
 
         // reflect: Rr = Ri - 2 N (Ri * N)
         disp = disp_rem - (2 * (disp_rem * m->n_norm())) * m->n_norm();
@@ -46,7 +46,7 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 
   // compute displacement
   double scale = sqrt(4*spec.D()*dt);
-  Vector3D disp{scale * state.rng_norm(), scale * state.rng_norm(),
+  Vec3 disp{scale * state.rng_norm(), scale * state.rng_norm(),
     scale * state.rng_norm()};
 
   // diffuse and collide until we're at the end of our diffusion step

@@ -63,27 +63,27 @@ public:
   }
 
   // coordinate vectors of MeshElement: u, v and n
-  const Vector3D& u() const {
+  const Vec3& u() const {
     return u_;
   }
 
-  const Vector3D& v() const {
+  const Vec3& v() const {
     return v_;
   }
 
-  const Vector3D& n() const {
+  const Vec3& n() const {
     return normal_;
   }
 
   // normalized normal vector
-  const Vector3D& n_norm() const {
+  const Vec3& n_norm() const {
     return normal_norm_;
   }
 
   // coordinates MeshElement vertices
-  const Vector3D& v0() const;
-  const Vector3D& v1() const;
-  const Vector3D& v2() const;
+  const Vec3& v0() const;
+  const Vec3& v1() const;
+  const Vec3& v2() const;
 
   void add_meshElementProperty(const MeshElementProperty* prop);
   bool delete_meshElementProperty(const MeshElementProperty* prop);
@@ -94,10 +94,10 @@ private:
   uint64_t vert0_;
   uint64_t vert1_;
   uint64_t vert2_;
-  Vector3D u_;           // triangle vectors
-  Vector3D v_;
-  Vector3D normal_;      // normal vector
-  Vector3D normal_norm_; // normalized normal vector - precomputed for efficiency
+  Vec3 u_;           // triangle vectors
+  Vec3 v_;
+  Vec3 normal_;      // normal vector
+  Vec3 normal_norm_; // normalized normal vector - precomputed for efficiency
   const Mesh& mesh_;     // reference to parent mesh
   Vec<const MeshElementProperty*> props_;
 };
@@ -114,9 +114,9 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const Mesh& m);
 
-  void add_vertex(Vector3D&& x);
+  void add_vertex(Vec3&& x);
 
-  const Vector3D& get_vertex(size_t i) const {
+  const Vec3& get_vertex(size_t i) const {
     return verts_[i];
   }
 
@@ -141,7 +141,7 @@ public:
 private:
 
   std::string name_;
-  Vec<Vector3D> verts_;
+  Vec<Vec3> verts_;
   MeshElements meshElems_;
 };
 using MeshPtr = std::unique_ptr<Mesh>;
@@ -151,7 +151,7 @@ std::ostream& operator<<(std::ostream& os, const Mesh& m);
 
 // helper function for creating a rectangular geometry primitive. This function
 // returns a vector with pointers to all MeshElements.
-Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector3D& urc);
+Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vec3& llc, const Vec3& urc);
 
 // intersect tests for ray triangle intersections. Possible return values are
 //  0: triangle and ray segment intersect, in this case hitPoint contains the
@@ -160,8 +160,8 @@ Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc, const Vector
 //  2: triangle and ray do not intersect
 //  3: ray and triangle are co-planar
 //  4: triangle is degenerate
-int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
-  Vector3D* hitPoint);
+int intersect(const Vec3& p0, const Vec3& disp, const MeshElement *m,
+  Vec3* hitPoint);
 
 #endif
 

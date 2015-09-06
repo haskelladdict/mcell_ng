@@ -8,8 +8,8 @@
 #include <ostream>
 #include <vector>
 
-// Vector3D represents a 3D vector
-struct Vector3D {
+// Vec3 represents a 3D vector
+struct Vec3 {
   double x;
   double y;
   double z;
@@ -26,30 +26,30 @@ struct Vector3D {
 };
 
 // operator+ provides vector addition
-Vector3D operator+(const Vector3D& a, const Vector3D& b);
+Vec3 operator+(const Vec3& a, const Vec3& b);
 
 // operator+= provides in place vector addition
-Vector3D& operator+=(Vector3D& a, const Vector3D& b);
+Vec3& operator+=(Vec3& a, const Vec3& b);
 
 // operator- provides vector subtraction
-Vector3D operator-(const Vector3D& a, const Vector3D& b);
+Vec3 operator-(const Vec3& a, const Vec3& b);
 
 // operator-= provides in place vector subtraction
-Vector3D& operator-=(Vector3D& a, const Vector3D& b);
+Vec3& operator-=(Vec3& a, const Vec3& b);
 
-// operator<< for Vector3D is intended mostly to help with debugging
-std::ostream& operator<<(std::ostream& os, const Vector3D& v);
+// operator<< for Vec3 is intended mostly to help with debugging
+std::ostream& operator<<(std::ostream& os, const Vec3& v);
 
-// operator* implements a dot product between two Vector3Ds
-// and a scalar multiplication between a Vector3D and a double
-double operator*(const Vector3D& a, const Vector3D& b);
-Vector3D operator*(double r, const Vector3D& a);
+// operator* implements a dot product between two Vec3s
+// and a scalar multiplication between a Vec3 and a double
+double operator*(const Vec3& a, const Vec3& b);
+Vec3 operator*(double r, const Vec3& a);
 
-// cross provides a cross product between two Vector3Ds
-Vector3D cross(const Vector3D& a, const Vector3D& b);
+// cross provides a cross product between two Vec3s
+Vec3 cross(const Vec3& a, const Vec3& b);
 
 // normalize returns a normalized version of the supplied vector
-Vector3D normalize(const Vector3D& a);
+Vec3 normalize(const Vec3& a);
 
 
 // range checked vector implementation

@@ -15,7 +15,7 @@ Mesh::Mesh(std::string name) : name_{name} {};
 
 
 // addVertex adds a new vertex at the given position to the Mesh
-void Mesh::add_vertex(Vector3D&& x) {
+void Mesh::add_vertex(Vec3&& x) {
   verts_.emplace_back(std::move(x));
 }
 
@@ -87,36 +87,36 @@ bool MeshElement::delete_meshElementProperty(const MeshElementProperty* prop) {
 }
 
 
-// v0, v1, v2 return the locations of vertex 0 through 2 as Vector3Ds
-const Vector3D& MeshElement::v0() const {
+// v0, v1, v2 return the locations of vertex 0 through 2 as Vec3s
+const Vec3& MeshElement::v0() const {
   return mesh_.get_vertex(vert0_);
 }
 
-const Vector3D& MeshElement::v1() const {
+const Vec3& MeshElement::v1() const {
   return mesh_.get_vertex(vert1_);
 }
 
-const Vector3D& MeshElement::v2() const {
+const Vec3& MeshElement::v2() const {
   return mesh_.get_vertex(vert2_);
 }
 
 
 // helper function for creating a rectangular geometry primitive
-Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc,
-  const Vector3D& urc) {
+Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vec3& llc,
+  const Vec3& urc) {
 
   // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
   assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
 
-  Vector3D diag = urc - llc;
-  mesh->add_vertex(Vector3D{llc});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{diag.x, 0.0, 0.0});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{0.0, diag.y, 0.0});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{0.0, 0.0, diag.z});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{diag.x, diag.y, 0.0});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{diag.x, 0.0, diag.z});
-  mesh->add_vertex(Vector3D{llc} + Vector3D{0.0, diag.y, diag.z});
-  mesh->add_vertex(Vector3D{urc});
+  Vec3 diag = urc - llc;
+  mesh->add_vertex(Vec3{llc});
+  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, 0.0, 0.0});
+  mesh->add_vertex(Vec3{llc} + Vec3{0.0, diag.y, 0.0});
+  mesh->add_vertex(Vec3{llc} + Vec3{0.0, 0.0, diag.z});
+  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, diag.y, 0.0});
+  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, 0.0, diag.z});
+  mesh->add_vertex(Vec3{llc} + Vec3{0.0, diag.y, diag.z});
+  mesh->add_vertex(Vec3{urc});
 
   Vec<MeshElement*> elems;
   elems.emplace_back(mesh->add_meshElement(0,1,5));
@@ -145,8 +145,8 @@ Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vector3D& llc,
 //
 // NOTE: This function was adapted from Dan Sunday
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
-int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
-  Vector3D* hitPoint) {
+int intersect(const Vec3& p0, const Vec3& disp, const MeshElement *m,
+  Vec3* hitPoint) {
 
   // if the normal vector is zero triangle is degenerate
   if (same(m->n().x, 0.0) && same(m->n().y, 0.0) && same(m->n().z, 0.0)) {
@@ -155,7 +155,7 @@ int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
 
   // compute intersection of ray from p0 along disp with plane in which m is
   // located
-  Vector3D w0 = p0 - m->v0();
+  Vec3 w0 = p0 - m->v0();
   double a = -(m->n() * w0);
   double b = m->n() * disp;
   if (fabs(b) < GEOM_EPSILON) {  // our ray is parallel to triangle plane
@@ -176,9 +176,9 @@ int intersect(const Vector3D& p0, const Vector3D& disp, const MeshElement *m,
 
   // now test that hitPoint is within the triangle
   // we use local variable for efficiency
-  Vector3D w = *hitPoint - m->v0();
-  Vector3D u = m->u();
-  Vector3D v = m->v();
+  Vec3 w = *hitPoint - m->v0();
+  Vec3 u = m->u();
+  Vec3 v = m->v();
   double uu = u * u;
   double uv = u * v;
   double vv = v * v;

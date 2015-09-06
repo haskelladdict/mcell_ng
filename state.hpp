@@ -40,6 +40,11 @@ public:
     return meshes_;
   }
 
+  MolSpecies* create_species(MolSpecies spec) {
+    species_.emplace_back(std::move(spec));
+    return &species_[species_.size()-1];
+  }
+
   SpeciesContainer& species() {
     return species_;
   }

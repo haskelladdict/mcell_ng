@@ -20,41 +20,44 @@ int main() {
   cout << "Hello world" << endl;
 
   double dt = 1e-6;
-
+  const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
   auto meshPtr = state.create_Mesh("cube");
-  auto meshElems = create_rectangle(meshPtr, Vector3D{-0.1, -0.1, -0.1},
-    Vector3D{0.1, 0.1, 0.1});
+  auto meshElems = create_rectangle(meshPtr, Vec3{-0.1, -0.1, -0.1},
+    Vec3{0.1, 0.1, 0.1});
 
-  auto aID = state.species().create("A", 600);
+  //auto aID = state.species().create("A", 600);
+  auto aSpec = state.create_species(MolSpecies("A", 600));
   for (int i=0; i < 10000; ++i) {
-    state.volMols().create(aID, Vector3D{0.0,0.0,0.0});
+    state.volMols().create(aSpec, Vec3{0.0,0.0,0.0});
   }
-
+/*
   auto bID = state.species().create("B", 900);
   for (int i=0; i < 12000; ++i) {
-    state.volMols().create(bID, Vector3D{0.05,0.05,0.05});
+    state.volMols().create(bID, Vec3{0.05,0.05,0.05});
   }
+*/
 
-  if (!write_cellblender(state,
-    "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", 0)) {
+
+  if (!write_cellblender(state, outDir, "test", 0)) {
     std::cerr << "failed to write output" << endl;
   }
 
+
   // do a few diffusion steps
-  for (int i=1; i < 1000; ++i) {
+  for (int i=1; i < 100; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
-      for (auto& m : state.volMols()[spec.ID()]) {
+      for (auto& m : state.volMols()[spec.name()]) {
         if (!diffuse(state, spec, m, dt)) {
           cout << "error diffusing molecule " << spec.name() << endl;
         }
       }
     }
+
     if (i % 10 == 0) {
-      if (!write_cellblender(state,
-        "/Users/markus/programming/cpp/mcell_ng/build/viz_data", "test", i)) {
+      if (!write_cellblender(state, outDir, "test", i)) {
         std::cerr << "failed to write output" << endl;
       }
     }

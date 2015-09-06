@@ -14,7 +14,7 @@
 class Mol {
 
 public:
-  Mol(long specID, double t);
+  Mol(const MolSpecies* spec, double t);
   virtual ~Mol() = 0;
 
 
@@ -22,13 +22,13 @@ public:
     return t_;
   }
 
-  long specID() const {
-    return specID_;
+  const MolSpecies* spec() const {
+    return spec_;
   }
 
 
 private:
-  long specID_;  // what species are we
+  const MolSpecies* spec_;  // what species are we
   double t_;     // birthday
 };
 
@@ -38,39 +38,39 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(long specID, const Vector3D& pos, double t);
+  VolMol(const MolSpecies* spec, const Vec3& pos, double t);
 
-  const Vector3D& pos() const {
+  const Vec3& pos() const {
     return pos_;
   }
 
-  void moveTo(const Vector3D& to);
+  void moveTo(const Vec3& to);
 
 
 private:
-  Vector3D pos_;
+  Vec3 pos_;
 };
 using VolMolContainer = Vec<VolMol>;
 
 
-// VolMolMap holds all molecules in the simulation organized by species id
+// VolMolMap holds all molecules in the simulation organized by species name
 class VolMolMap {
 
 public:
 
-  using mapped_type = std::unordered_map<long, VolMolContainer>::mapped_type;
+  using mapped_type = std::unordered_map<std::string, VolMolContainer>::mapped_type;
 
-  VolMol& create(long specID, const Vector3D& pos, double t = 0.0);
+  VolMol& create(const MolSpecies *spec, const Vec3& pos, double t = 0.0);
   bool del(VolMol& mol);
 
-  mapped_type& operator[](long ID) {
-    return volMolMap_[ID];
+  mapped_type& operator[](std::string specName) {
+    return volMolMap_[specName];
   }
 
 
 private:
 
-  std::unordered_map<long, VolMolContainer> volMolMap_;
+  std::unordered_map<std::string, VolMolContainer> volMolMap_;
 };
 
 
