@@ -19,13 +19,23 @@
 const double GEOM_EPSILON = 1e-12;
 const double GEOM_EPSILON_2 = 1e-24;
 
-// triangle describes a single triangle on a mesh. It consists of the indexes
-// of the vertices making up the triangle.
+
+// MeshProp described the properties of a given MeshElement, e.g. which object
+// it belongs to.
+struct MeshProp {
+  std::string name;   // name of object
+};
+using MeshPropPtr = std::shared_ptr<MeshProp>;
+
+
+// MeshElement describes a single triangle on a mesh. It consists of the
+// triangle vertices and also the triangles uv and normal vectors.
 class MeshElement{
 
 public:
 
-  MeshElement(const Vec3& a, const Vec3& b, const Vec3& c);
+  MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
+    MeshPropPtr prop = nullptr);
 
   const Vec3& a() const {
     return a_;
@@ -61,6 +71,7 @@ private:
   Vec3 u_, v_;     // triangle vectors
   Vec3 n_;         // normal vector
   Vec3 nn_;        // normalized normal vector - precomputed for efficiency
+  MeshPropPtr prop_; // properties of this element
 };
 
 using Mesh= Vec<MeshElement>;
