@@ -78,7 +78,7 @@ using Mesh= Vec<MeshElement>;
 
 // create_rectangle is a helper function for generating a rectangular geometry
 // primitive. This function returns a vector with pointers to all MeshElements.
-Mesh create_rectangle(const Vec3& llc, const Vec3& urc);
+Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshPropPtr prop = nullptr);
 
 // intersect tests for ray triangle intersections. Possible return values are
 //  0: triangle and ray segment intersect, in this case hitPoint contains the

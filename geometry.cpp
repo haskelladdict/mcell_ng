@@ -16,7 +16,7 @@ MeshElement::MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
 }
 
 // helper function for creating a rectangular geometry primitive
-Mesh create_rectangle(const Vec3& llc, const Vec3& urc) {
+Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshPropPtr prop) {
 
   // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
   assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
@@ -33,21 +33,19 @@ Mesh create_rectangle(const Vec3& llc, const Vec3& urc) {
   auto v7 = Vec3{urc};
 
   Mesh mesh;
-  auto meshProp = std::make_shared<MeshProp>();
-  meshProp->name = "cube";
   mesh.reserve(8);
-  mesh.emplace_back(MeshElement(v0, v1, v5, meshProp));
-  mesh.emplace_back(MeshElement(v0, v5, v3, meshProp));
-  mesh.emplace_back(MeshElement(v1, v4, v7, meshProp));
-  mesh.emplace_back(MeshElement(v1, v7, v5, meshProp));
-  mesh.emplace_back(MeshElement(v4, v2, v6, meshProp));
-  mesh.emplace_back(MeshElement(v4, v6, v7, meshProp));
-  mesh.emplace_back(MeshElement(v2, v0, v3, meshProp));
-  mesh.emplace_back(MeshElement(v2, v3, v6, meshProp));
-  mesh.emplace_back(MeshElement(v5, v7, v6, meshProp));
-  mesh.emplace_back(MeshElement(v5, v6, v3, meshProp));
-  mesh.emplace_back(MeshElement(v0, v2, v1, meshProp));
-  mesh.emplace_back(MeshElement(v1, v2, v4, meshProp));
+  mesh.emplace_back(MeshElement(v0, v1, v5, prop));
+  mesh.emplace_back(MeshElement(v0, v5, v3, prop));
+  mesh.emplace_back(MeshElement(v1, v4, v7, prop));
+  mesh.emplace_back(MeshElement(v1, v7, v5, prop));
+  mesh.emplace_back(MeshElement(v4, v2, v6, prop));
+  mesh.emplace_back(MeshElement(v4, v6, v7, prop));
+  mesh.emplace_back(MeshElement(v2, v0, v3, prop));
+  mesh.emplace_back(MeshElement(v2, v3, v6, prop));
+  mesh.emplace_back(MeshElement(v5, v7, v6, prop));
+  mesh.emplace_back(MeshElement(v5, v6, v3, prop));
+  mesh.emplace_back(MeshElement(v0, v2, v1, prop));
+  mesh.emplace_back(MeshElement(v1, v2, v4, prop));
   return mesh;
 }
 
