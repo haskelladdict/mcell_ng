@@ -23,10 +23,17 @@ int main() {
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
-  auto cube = create_rectangle(Vec3{-0.1, -0.1, -0.1}, Vec3{0.1, 0.1, 0.1});
-  state.add_mesh(cube);
 
-  //auto aID = state.species().create("A", 600);
+  MeshPropPtr prop1 = std::make_shared<MeshProp>();
+  prop1->name = "cube1";
+  auto cube1 = create_rectangle(Vec3{-0.1, -0.1, -0.1}, Vec3{0.1, 0.1, 0.1}, prop1);
+  state.add_mesh(cube1);
+
+  MeshPropPtr prop2 = std::make_shared<MeshProp>();
+  prop2->name = "cube2";
+  auto cube2 = create_rectangle(Vec3{-0.01, -0.01, -0.01}, Vec3{0.01, 0.01, 0.01}, prop2);
+  state.add_mesh(cube2);
+
   auto aSpec = state.create_species(MolSpecies("A", 600));
   for (int i=0; i < 10000; ++i) {
     state.volMols().create(aSpec, Vec3{0.0,0.0,0.0});

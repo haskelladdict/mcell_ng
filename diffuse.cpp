@@ -8,32 +8,51 @@
 #include "util.hpp"
 
 
+// collide determines the closes mesh element along the displacement vector
+// (if any) and the corresponding hitpoint on the mesh
 int collide(const State& state, VolMol& mol, Vec3& disp) {
-  for (const auto& m : state.get_mesh()) {
-    Vec3 hitPoint;
-    if (intersect(mol.pos(), disp, m, &hitPoint) == 0) {
-      Vec3 disp_rem = hitPoint - mol.pos();
 
-      // reflect: Rr = Ri - 2 N (Ri * N)
-      disp = disp_rem - (2 * (disp_rem * m.n_norm())) * m.n_norm();
+  Vec3 hitPoint;
+  Vec3 disp_rem;
 
-      // move slightly away from the triangle along the reflected ray.
-      // If we happen to end our ray at hitpoint we move along the triangle
-      // normal instead.
-      if (disp.norm2() > GEOM_EPSILON_2) {
-        double n = disp.norm();
-        auto disp_n = (1.0 / n) * disp;
-        hitPoint += GEOM_EPSILON * disp_n;
-        disp = (n - GEOM_EPSILON) * disp_n;
-      } else {
-        double side = (disp_rem * m.n_norm()) > 0 ? -1 : 1;
-        hitPoint += side * GEOM_EPSILON * m.n_norm();
+  const auto& mesh = state.get_mesh();
+  Mesh::const_iterator m = mesh.end();
+  double disp_len2 = std::numeric_limits<float>::max();
+  for (Mesh::const_iterator it = mesh.begin(); it != mesh.end(); ++it) {
+    Vec3 hitPoint_tmp;
+    if (intersect(mol.pos(), disp, *it, &hitPoint_tmp) == 0) {
+      Vec3 rem = hitPoint_tmp - mol.pos();
+      double rem_len2 = rem.norm2();
+      if (rem_len2 < disp_len2) {
+        hitPoint = hitPoint_tmp;
+        disp_rem = rem;
+        disp_len2 = rem_len2;
+        m = it;
       }
-      mol.moveTo(hitPoint);
-      return 1;
     }
   }
-  return 0;
+
+  if (m == mesh.end()) {
+    return 0;
+  }
+
+  // reflect: Rr = Ri - 2 N (Ri * N)
+  disp = disp_rem - (2 * (disp_rem * m->n_norm())) * m->n_norm();
+
+  // move slightly away from the triangle along the reflected ray.
+  // If we happen to end our ray at hitpoint we move along the triangle
+  // normal instead.
+  if (disp.norm2() > GEOM_EPSILON_2) {
+    double n = disp.norm();
+    auto disp_n = (1.0 / n) * disp;
+    hitPoint += GEOM_EPSILON * disp_n;
+    disp = (n - GEOM_EPSILON) * disp_n;
+  } else {
+    double side = (disp_rem * m->n_norm()) > 0 ? -1 : 1;
+    hitPoint += side * GEOM_EPSILON * m->n_norm();
+  }
+  mol.moveTo(hitPoint);
+  return 1;
 }
 
 
