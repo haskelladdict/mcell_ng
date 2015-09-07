@@ -2,7 +2,6 @@
 // Licensed under BSD license, see LICENSE file for details
 
 #include <cmath>
-#include <limits>
 
 #include "util.hpp"
 
@@ -65,14 +64,3 @@ Vec3 cross(const Vec3& a, const Vec3& b) {
 Vec3 normalize(const Vec3& a) {
   return (1 / a.norm()) * a;
 }
-
-
-// same compares two floating point values for equality
-// NOTE: This wrapper is currently not very sophisticated. Needs more work.
-bool same(double x, double y) {
-  return fabs(x - y) < std::numeric_limits<double>::epsilon();
-}
-
-
-
-

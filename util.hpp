@@ -5,6 +5,7 @@
 #define UTIL_HPP
 
 #include <cmath>
+#include <limits>
 #include <ostream>
 #include <vector>
 
@@ -70,7 +71,9 @@ public:
 
 
 // same compares two floating point values for equality
-bool same(double x, double y);
-
+// NOTE: This wrapper is currently not very sophisticated. Needs more work.
+inline bool same(double x, double y) {
+  return fabs(x - y) < std::numeric_limits<double>::epsilon();
+}
 
 #endif

@@ -23,9 +23,8 @@ int main() {
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
-  auto meshPtr = state.create_Mesh("cube");
-  auto meshElems = create_rectangle(meshPtr, Vec3{-0.1, -0.1, -0.1},
-    Vec3{0.1, 0.1, 0.1});
+  auto cube = create_rectangle(Vec3{-0.1, -0.1, -0.1}, Vec3{0.1, 0.1, 0.1});
+  state.add_mesh(cube);
 
   //auto aID = state.species().create("A", 600);
   auto aSpec = state.create_species(MolSpecies("A", 600));

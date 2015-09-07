@@ -1,137 +1,52 @@
 // Copyright 2015 Markus Dittrich
 // Licensed under BSD license, see LICENSE file for details
 
-#include <algorithm>
 #include <cassert>
-#include <iostream>
-#include <memory>
-#include <utility>
 
 #include "geometry.hpp"
 
-
-// GeomObject constructor
-Mesh::Mesh(std::string name) : name_{name} {};
-
-
-// addVertex adds a new vertex at the given position to the Mesh
-void Mesh::add_vertex(Vec3&& x) {
-  verts_.emplace_back(std::move(x));
-}
-
-
-// add_meshElement adds a new triangle among the available vertices of a mesh
-// by providing the respective vertex indices
-MeshElement* Mesh::add_meshElement(uint64_t i0, uint64_t i1, uint64_t i2,
-  const MeshElementProperty* props) {
-
-  assert(i0 < verts_.size());
-  assert(i1 < verts_.size());
-  assert(i2 < verts_.size());
-
-  meshElems_.emplace_back(std::make_unique<MeshElement>(MeshElement{i0, i1, i2,
-    *this, props}));
-  return meshElems_.back().get();
-}
-
-
-// provide operator<< for Mesh for debugging purposes
-std::ostream& operator<<(std::ostream& os, const Mesh& m) {
-  os << m.verts_.size() << " Vertices:\n";
-  for (const auto& v : m.verts_) {
-    os << v << "\n";
-  }
-
-  os << "\n" << m.meshElems_.size() << " Triangles:\n";
-  for (const auto& t : m.meshElems_) {
-    os << "{" << t->i0() << "," << t->i1() << "," << t->i2() << "}\n";
-  }
-  return os;
-}
-
-
 // MeshElement constructor
-MeshElement::MeshElement(uint64_t i0, uint64_t i1, uint64_t i2, const Mesh& parent,
-  const MeshElementProperty* props) : vert0_{i0}, vert1_{i1}, vert2_{i2},
-  mesh_{parent} {
+MeshElement::MeshElement(const Vec3& a, const Vec3& b, const Vec3& c) :
+  a_{a}, b_{b}, c_{c} {
 
-  u_ = mesh_.get_vertex(i1) - mesh_.get_vertex(i0);
-  v_ = mesh_.get_vertex(i2) - mesh_.get_vertex(i0);
-  normal_ = cross(u_, v_);
-  normal_norm_ = normalize(normal_);
-
-  if (props != nullptr) {
-    props_.emplace_back(props);
-  }
+  u_ = b - a;
+  v_ = c - a;
+  n_ = cross(u_, v_);
+  nn_ = normalize(n_);
 }
-
-
-// add_meshElementProperty adds a new mesh element property to this mesh element
-void MeshElement::add_meshElementProperty(const MeshElementProperty* prop) {
-  assert(prop != nullptr);
-  props_.emplace_back(prop);
-}
-
-
-// delete_meshElementProperty removes an existing mesh element property from
-// this mesh element. If the removed property did not exist on the mesh element
-// the function returns false and true otherwise.
-bool MeshElement::delete_meshElementProperty(const MeshElementProperty* prop) {
-  assert(prop != nullptr);
-  auto it = std::find(props_.begin(), props_.end(), prop);
-  if (it == props_.end()) {
-    return false;
-  }
-  props_.erase(it);
-  return true;
-}
-
-
-// v0, v1, v2 return the locations of vertex 0 through 2 as Vec3s
-const Vec3& MeshElement::v0() const {
-  return mesh_.get_vertex(vert0_);
-}
-
-const Vec3& MeshElement::v1() const {
-  return mesh_.get_vertex(vert1_);
-}
-
-const Vec3& MeshElement::v2() const {
-  return mesh_.get_vertex(vert2_);
-}
-
 
 // helper function for creating a rectangular geometry primitive
-Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vec3& llc,
-  const Vec3& urc) {
+Mesh create_rectangle(const Vec3& llc, const Vec3& urc) {
 
   // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
   assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
 
   Vec3 diag = urc - llc;
-  mesh->add_vertex(Vec3{llc});
-  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, 0.0, 0.0});
-  mesh->add_vertex(Vec3{llc} + Vec3{0.0, diag.y, 0.0});
-  mesh->add_vertex(Vec3{llc} + Vec3{0.0, 0.0, diag.z});
-  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, diag.y, 0.0});
-  mesh->add_vertex(Vec3{llc} + Vec3{diag.x, 0.0, diag.z});
-  mesh->add_vertex(Vec3{llc} + Vec3{0.0, diag.y, diag.z});
-  mesh->add_vertex(Vec3{urc});
 
-  Vec<MeshElement*> elems;
-  elems.emplace_back(mesh->add_meshElement(0,1,5));
-  elems.emplace_back(mesh->add_meshElement(0,5,3));
-  elems.emplace_back(mesh->add_meshElement(1,4,7));
-  elems.emplace_back(mesh->add_meshElement(1,7,5));
-  elems.emplace_back(mesh->add_meshElement(4,2,6));
-  elems.emplace_back(mesh->add_meshElement(4,6,7));
-  elems.emplace_back(mesh->add_meshElement(2,0,3));
-  elems.emplace_back(mesh->add_meshElement(2,3,6));
-  elems.emplace_back(mesh->add_meshElement(5,7,6));
-  elems.emplace_back(mesh->add_meshElement(5,6,3));
-  elems.emplace_back(mesh->add_meshElement(0,2,1));
-  elems.emplace_back(mesh->add_meshElement(1,2,4));
-  return elems;
+  auto v0 = Vec3{llc};
+  auto v1 = Vec3{llc} + Vec3{diag.x, 0.0, 0.0};
+  auto v2 = Vec3{llc} + Vec3{0.0, diag.y, 0.0};
+  auto v3 = Vec3{llc} + Vec3{0.0, 0.0, diag.z};
+  auto v4 = Vec3{llc} + Vec3{diag.x, diag.y, 0.0};
+  auto v5 = Vec3{llc} + Vec3{diag.x, 0.0, diag.z};
+  auto v6 = Vec3{llc} + Vec3{0.0, diag.y, diag.z};
+  auto v7 = Vec3{urc};
+
+  Mesh mesh;
+  mesh.reserve(8);
+  mesh.emplace_back(MeshElement(v0, v1, v5));
+  mesh.emplace_back(MeshElement(v0, v5, v3));
+  mesh.emplace_back(MeshElement(v1, v4, v7));
+  mesh.emplace_back(MeshElement(v1, v7, v5));
+  mesh.emplace_back(MeshElement(v4, v2, v6));
+  mesh.emplace_back(MeshElement(v4, v6, v7));
+  mesh.emplace_back(MeshElement(v2, v0, v3));
+  mesh.emplace_back(MeshElement(v2, v3, v6));
+  mesh.emplace_back(MeshElement(v5, v7, v6));
+  mesh.emplace_back(MeshElement(v5, v6, v3));
+  mesh.emplace_back(MeshElement(v0, v2, v1));
+  mesh.emplace_back(MeshElement(v1, v2, v4));
+  return mesh;
 }
 
 
@@ -145,19 +60,19 @@ Vec<MeshElement*> create_rectangle(Mesh* mesh, const Vec3& llc,
 //
 // NOTE: This function was adapted from Dan Sunday
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
-int intersect(const Vec3& p0, const Vec3& disp, const MeshElement *m,
+int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   Vec3* hitPoint) {
 
   // if the normal vector is zero triangle is degenerate
-  if (same(m->n().x, 0.0) && same(m->n().y, 0.0) && same(m->n().z, 0.0)) {
+  if (same(m.n().x, 0.0) && same(m.n().y, 0.0) && same(m.n().z, 0.0)) {
     return 4;
   }
 
   // compute intersection of ray from p0 along disp with plane in which m is
   // located
-  Vec3 w0 = p0 - m->v0();
-  double a = -(m->n() * w0);
-  double b = m->n() * disp;
+  Vec3 w0 = p0 - m.a();
+  double a = -(m.n() * w0);
+  double b = m.n() * disp;
   if (fabs(b) < GEOM_EPSILON) {  // our ray is parallel to triangle plane
     if (same(a, 0.0)) { // our ray is coplanar with the triangle
       return 3;
@@ -176,9 +91,9 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement *m,
 
   // now test that hitPoint is within the triangle
   // we use local variable for efficiency
-  Vec3 w = *hitPoint - m->v0();
-  Vec3 u = m->u();
-  Vec3 v = m->v();
+  Vec3 w = *hitPoint - m.a();
+  Vec3 u = m.u();
+  Vec3 v = m.v();
   double uu = u * u;
   double uv = u * v;
   double vv = v * v;

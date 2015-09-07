@@ -14,9 +14,6 @@
 #include "util.hpp"
 
 
-using Meshes = Vec<MeshPtr>;
-
-
 class State {
 
 public:
@@ -35,9 +32,10 @@ public:
   }
 
   // mesh related functionality
-  Mesh* create_Mesh(std::string name);
-  const Meshes& get_Meshes() const {
-    return meshes_;
+  void add_mesh(const Mesh& mesh);
+
+  const Mesh& get_mesh() const {
+    return mesh_;
   }
 
   MolSpecies* create_species(MolSpecies spec) {
@@ -57,7 +55,7 @@ private:
 
   mutable RngNorm rng_;
 
-  Meshes meshes_;
+  Mesh mesh_;
   SpeciesContainer species_;
   VolMolMap volMolMap_;
 };
