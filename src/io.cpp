@@ -5,9 +5,11 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
+#include <boost/algorithm/string.hpp>
 
 #include "io.hpp"
 #include "util.hpp"
@@ -62,17 +64,64 @@ bool write_cellblender(State& state, std::string path, std::string name,
   return true;
 }
 
+// mcsf_is_comment checks if a line in an mcsf file is a comment, i.e. starts
+// with a %
+static bool mcsf_is_comment(const std::string& line) {
+  if (!line.empty() && line[0] == '%') {
+    return true;
+  }
+  return false;
+}
+
+// mcsf_file_check tests if the first line in the parsed file contains the
+// the expected mcsf_begin=1
+static bool mcsf_file_check(const std::string& line) {
+  if (boost::trim_copy(line) != "mcsf_begin=1;") {
+    return false;
+  }
+  return true;
+}
 
 
+// parse_mcsf_tet_mesh parses an MCSF file containing a tet mesh and creates
+// and returns an internal representation of the mesh.
+Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets) {
 
+  std::ifstream file(fileName);
+  if (!file.is_open()) {
+    return Error{"failed to open file " + fileName};
+  }
 
+  std::string line;
+  if (!getline(file, line) || !mcsf_file_check(line)) {
+    return Error{fileName + "is not an mcsf mesh file"};
+  }
 
+  bool verts = false;
+  bool smplx = false;
+  long numVerts = 0;
+  long numSimplx = 0;
+  // need a try block since string to integer conversion might throw
+  try {
+    while(getline(file, line)) {
+      boost::trim(line);
+      if (line.length() == 0 || mcsf_is_comment(line)) {
+        continue;
+      }
+      Rvector<std::string> items;
+      boost::split(items, line, boost::is_any_of("\t "), boost::token_compress_on);
+      if (items[0] == "vertices") {
+        assert(items.size() == 3);
+        numVerts = std::stoll(items[2]);
+      } else if (items[0] == "simplices") {
+        assert(items.size() == 3);
+        numSimplx = std::stoll(items[2]);
+      }
+    }
+  } catch (std::invalid_argument& e) {
+    return Error("could not parse mcsf file");
+  }
+  std::cout << numVerts << " :: " << numSimplx << std::endl;
 
-
-
-
-
-
-
-
-
+  return noErr;
+}

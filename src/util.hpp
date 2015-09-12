@@ -55,7 +55,7 @@ Vec3 normalize(const Vec3& a);
 
 // range checked vector implementation
 template<typename T>
-class Vec : public std::vector<T> {
+class Rvector : public std::vector<T> {
 
 public:
   using std::vector<T>::vector;
@@ -68,6 +68,18 @@ public:
     return std::vector<T>::at(i);
   }
 };
+
+
+// operator<< for Rvector for debugging purposes
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Rvector<T>& rvec) {
+  os << "[";
+  for (const auto& v : rvec) {
+    os << v << ",";
+  }
+  os << "]";
+  return os;
+}
 
 
 // same compares two floating point values for equality

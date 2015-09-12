@@ -50,7 +50,7 @@ public:
 private:
   Vec3 pos_;
 };
-using VolMolContainer = Vec<VolMol>;
+using VolMolContainer = Rvector<VolMol>;
 
 
 // VolMolMap holds all molecules in the simulation organized by species name

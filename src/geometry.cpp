@@ -7,7 +7,7 @@
 
 // MeshElement constructor
 MeshElement::MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
-  MeshPropPtr prop) : a_{a}, b_{b}, c_{c}, prop_{prop} {
+  MeshProp prop) : a_{a}, b_{b}, c_{c}, prop_{prop} {
 
   u_ = b - a;
   v_ = c - a;
@@ -15,8 +15,9 @@ MeshElement::MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
   nn_ = normalize(n_);
 }
 
+#if 0
 // helper function for creating a rectangular geometry primitive
-Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshPropPtr prop) {
+Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshProp prop) {
 
   // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
   assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
@@ -48,6 +49,7 @@ Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshPropPtr prop) {
   mesh.emplace_back(MeshElement(v1, v2, v4, prop));
   return mesh;
 }
+#endif
 
 // intersect tests for ray triangle intersections. Possible return values are
 //  0: triangle and ray segment intersect, in this case hitPoint contains the
@@ -111,15 +113,3 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   }
   return 0;  // hitPoint is in m
 }
-
-
-
-
-
-
-
-
-
-
-
-

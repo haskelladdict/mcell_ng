@@ -13,6 +13,8 @@
 #include "species.hpp"
 #include "state.hpp"
 
+
+using std::cerr;
 using std::cout;
 using std::endl;
 
@@ -23,7 +25,16 @@ int main() {
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
+  Mesh m;
+  Tets t;
+  std::string meshFile = "../mcell_ng_trunk/tests/cube.m";
+  auto e = parse_mcsf_tet_mesh(meshFile, m, t);
+  if (e.err) {
+    cerr << e.desc << endl;
+    exit(1);
+  }
 
+#if 0
   MeshPropPtr prop1 = std::make_shared<MeshProp>();
   prop1->name = "cube1";
   auto cube1 = create_rectangle(Vec3{-0.1, -0.1, -0.1}, Vec3{0.1, 0.1, 0.1}, prop1);
@@ -38,6 +49,7 @@ int main() {
   for (int i=0; i < 10000; ++i) {
     state.volMols().create(aSpec, Vec3{0.0,0.0,0.0});
   }
+#endif
 /*
   auto bID = state.species().create("B", 900);
   for (int i=0; i < 12000; ++i) {
@@ -52,7 +64,7 @@ int main() {
 
 
   // do a few diffusion steps
-  for (int i=1; i < 100; ++i) {
+  for (int i=1; i < 1; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
       for (auto& m : state.volMols()[spec.name()]) {

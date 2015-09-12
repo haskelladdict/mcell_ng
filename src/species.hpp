@@ -29,7 +29,7 @@ private:
   std::string name_;     // species name
 };
 
-using SpeciesContainer = Vec<MolSpecies>;
+using SpeciesContainer = Rvector<MolSpecies>;
 
 
 #endif
