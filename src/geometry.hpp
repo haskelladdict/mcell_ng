@@ -105,14 +105,20 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
 // knows the indices t1 .. t4 to its neighboring Tet elements. A Tet index of
 // unset indicates that there is no neighboring Tet and we're thus at the
 // edge of the model geometry.
+// NOTE: Since MeshElements are shared between up to two Tets, they can either
+// be oriented with their normal to the outside or with their normal to the
+// inside (indicated by o1, o2, ... o4). If they are oriented normal in we have
+// to take that into account when checking for collisions.
 class Tet {
 
 public:
 
   const size_t unset = std::numeric_limits<size_t>::max();
 
-  size_t m1, m2, m3, m4;   // indices of MeshElements
-  size_t t1, t2, t3, t4;   // indices of neighboring Tets
+  size_t m[4];   // indices of MeshElements
+  size_t t[4];   // indices of neighboring Tets
+  int    o[4];   // orientation of MeshElements with respect to Tet
+                 // 1 indicates normal out, -1 normal in
 };
 
 using Tets = Rvector<Tet>;
