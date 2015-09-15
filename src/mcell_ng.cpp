@@ -27,7 +27,8 @@ int main() {
 
   Mesh m;
   Tets t;
-  std::string meshFile = "../mcell_ng_trunk/tests/cube.m";
+  //std::string meshFile = "../mcell_ng_trunk/tests/cube.m";
+  std::string meshFile = "../mcell_ng_trunk/tests/sphere.m";
   auto e = parse_mcsf_tet_mesh(meshFile, m, t);
   if (e.err) {
     cerr << e.desc << endl;

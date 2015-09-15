@@ -112,7 +112,7 @@ static void mcsf_parse_smplx(const Rvector<std::string>& items,
 // mcsf_compute_mesh_key computes the unique key for a set of vertex indices
 // by sorting them.
 // NOTE: Since we sort the vector we take a copy instead of a ref
-static std::string mcsf_compute_mesh_key(Rvector<size_t> verts) {
+static std::string compute_mesh_key(Rvector<size_t> verts) {
   std::sort(verts.begin(), verts.end());
   std::ostringstream sid;
   for (const auto v : verts) {
@@ -122,46 +122,87 @@ static std::string mcsf_compute_mesh_key(Rvector<size_t> verts) {
 }
 
 
-// mcsf_create_tets creates the final MeshElements and Tets based on the list
+// mark_tet_neighbors marks the two tetrahdra with ID tet1 and tet2 as being
+// neighbors across mesh element with ID meshID
+void mark_tet_neighbors(Tets& tets, size_t tet1ID, size_t tet2ID, size_t meshID) {
+  assert(tet1ID < tets.size());
+  assert(tet2ID < tets.size());
+
+  Tet& tet1 = tets[tet1ID];
+  for (size_t i=0; i < tet1.m.size(); ++i) {
+    if (tet1.m[i] == meshID) {
+      tet1.t[i] = tet2ID;
+      break;
+    }
+    assert(true);  // should never get here
+  }
+
+  Tet& tet2 = tets[tet2ID];
+  for (size_t i=0; i < tet2.m.size(); ++i) {
+    if (tet2.m[i] == meshID) {
+      tet2.t[i] = tet1ID;
+      break;
+    }
+    assert(true);  // should never get here
+  }
+}
+
+// create_tets creates the final MeshElements and Tets based on the list
 // of vertices and tetrahedral connectivities.
 // The proper mesh orientation for each of a tetrahedron's 4 consititutive
 // triangles is determined according to tetgen's vertex numbering shown in
 // http://wias-berlin.de/software/tetgen/fformats.ele.html
-static void mcsf_create_tets(const Rvector<Vec3>& verts,
+static void create_tets(const Rvector<Vec3>& verts,
   const Rvector<Rvector<size_t>>& tetVerts, Mesh& mesh, Tets& tets) {
   assert(mesh.size() == 0);
   assert(tets.size() == 0);
+
+  // these are the vertex indices of all triangles which are part of a tet
   Rvector<Rvector<size_t>> tetFaces{Rvector<size_t>{0, 2, 1}
                                    ,Rvector<size_t>{0, 1, 3}
                                    ,Rvector<size_t>{1, 2, 3}
                                    ,Rvector<size_t>{2, 0, 3}};
-  std::unordered_map<std::string, size_t> meshMap;
-  size_t meshCount = 0;
-  for (const auto& v : tetVerts) {
+
+  std::unordered_map<std::string, size_t> triangleMap; // map triangles to their index
+  std::unordered_map<size_t, Rvector<size_t>> tetMap;  // map triangles to parent tets
+
+  // for each tet, extract the consititutive triangles, and either create new
+  // MeshElements for them or retrieve the index of existing ones. Tets are then
+  // assigned the proper indices and orientations of the triangles.
+  size_t meshID = 0;
+  for (size_t t = 0; t < tetVerts.size(); ++t) {
+    const auto& v = tetVerts[t];
     Tet tet;
-    size_t faceCount = 0;
-    for (const auto& f : tetFaces) {
-      Rvector<size_t> mvs{v[f[0]], v[f[1]], v[f[2]]};
-      std::string key = mcsf_compute_mesh_key(mvs);
-      if (meshMap.find(key) == meshMap.end()) {
-        meshMap[key] = meshCount;
-        mesh.emplace_back(MeshElement{verts[mvs[0]], verts[mvs[1]], verts[mvs[2]]});
-        tet.m[faceCount] = meshCount;
-        tet.o[faceCount] = 1;
-        meshCount++;
+    for (size_t fc = 0; fc < tetFaces.size(); ++fc) {
+      const auto& f = tetFaces[fc];
+      Rvector<size_t> triangle{v[f[0]], v[f[1]], v[f[2]]};
+      std::string key = compute_mesh_key(triangle);
+      if (triangleMap.find(key) == triangleMap.end()) {
+        triangleMap[key] = meshID;
+        tetMap[meshID].push_back(t);
+        mesh.emplace_back(MeshElement{verts[triangle[0]]
+                                     ,verts[triangle[1]]
+                                     ,verts[triangle[2]]});
+        tet.m[fc] = meshID;
+        tet.o[fc] = 1;
+        meshID++;
       } else {
-        tet.m[faceCount] = meshMap[key];
-        tet.o[faceCount] = -1;
+        size_t id = triangleMap[key];
+        tet.m[fc] = id;
+        tet.o[fc] = -1;
+        tetMap[id].push_back(t);
       }
-      faceCount++;
     }
     tets.emplace_back(tet);
   }
+  // connect shared tets across shared faces
+  for (const auto& m : tetMap) {
+    assert(m.second.size() == 2 || m.second.size() == 1);
+    if (m.second.size() == 2) {
+      mark_tet_neighbors(tets, m.second[0], m.second[1], m.first);
+    }
+  }
 }
-
-
-
-
 
 
 // parse_mcsf_tet_mesh parses an MCSF file containing a tet mesh and creates
@@ -180,8 +221,8 @@ Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets) {
 
   bool inVerts = false;
   bool inSmplx = false;
-  long numVerts = 0;
-  long numSimplx = 0;
+  size_t numVerts = 0;
+  size_t numSimplx = 0;
   Rvector<Vec3> verts;
   Rvector<Rvector<size_t>> tetVerts;
   // need a try block since string to integer/double conversion might throw
@@ -218,11 +259,9 @@ Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets) {
   } catch (std::invalid_argument& e) {
     return Error("could not parse mcsf file");
   }
-  mcsf_create_tets(verts, tetVerts, mesh, tets);
-//  std::cout << numVerts << " :: " << numSimplx << std::endl;
-//  std::cout.precision(10);
-//  std::cout << verts << std::endl;
-//  std::cout << tetVerts << std::endl;
+  assert(verts.size() == numVerts);
+  assert(tetVerts.size() == numSimplx);
+  create_tets(verts, tetVerts, mesh, tets);
 
   return noErr;
 }

@@ -4,6 +4,7 @@
 #ifndef GEOMETRY_HPP
 #define GEOMETRY_HPP
 
+#include <array>
 #include <cstdint>
 #include <memory>
 #include <ostream>
@@ -80,7 +81,7 @@ private:
   Vec3 u_, v_;     // triangle vectors
   Vec3 n_;         // normal vector
   Vec3 nn_;        // normalized normal vector - precomputed for efficiency
-  MeshProp prop_;   // properties of this element
+  MeshProp prop_;  // properties of this element
 };
 
 using Mesh = Rvector<MeshElement>;
@@ -115,10 +116,15 @@ public:
 
   const size_t unset = std::numeric_limits<size_t>::max();
 
-  size_t m[4];   // indices of MeshElements
-  size_t t[4];   // indices of neighboring Tets
-  int    o[4];   // orientation of MeshElements with respect to Tet
-                 // 1 indicates normal out, -1 normal in
+  // indices of MeshElements
+  std::array<size_t, 4> m{{unset, unset, unset, unset}};
+
+  // indices of neighboring Tets
+  std::array<size_t, 4> t{{unset, unset, unset, unset}};
+
+  // orientation of MeshElements with respect to Tet;
+  //  1 indicates normal out, -1 normal in
+  std::array<int, 4> o{{0, 0, 0, 0 }};
 };
 
 using Tets = Rvector<Tet>;
