@@ -11,6 +11,6 @@ State::State(uint64_t seed) : rng_{seed} {}
 
 
 // create_Mesh adds a new mesh object to the simulation
-void State::add_mesh(const Mesh& m) {
+void State::add_mesh(const geom::Mesh& m) {
   mesh_.insert(mesh_.end(), m.begin(), m.end());
 }

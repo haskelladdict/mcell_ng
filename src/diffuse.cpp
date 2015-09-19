@@ -16,9 +16,9 @@ int collide(const State& state, VolMol& mol, Vec3& disp) {
   Vec3 disp_rem;
 
   const auto& mesh = state.get_mesh();
-  Mesh::const_iterator m = mesh.end();
+  geom::Mesh::const_iterator m = mesh.end();
   double disp_len2 = std::numeric_limits<float>::max();
-  for (Mesh::const_iterator it = mesh.begin(); it != mesh.end(); ++it) {
+  for (geom::Mesh::const_iterator it = mesh.begin(); it != mesh.end(); ++it) {
     Vec3 hitPoint_tmp;
     if (intersect(mol.pos(), disp, *it, &hitPoint_tmp) == 0) {
       Vec3 rem = hitPoint_tmp - mol.pos();
@@ -42,14 +42,14 @@ int collide(const State& state, VolMol& mol, Vec3& disp) {
   // move slightly away from the triangle along the reflected ray.
   // If we happen to end our ray at hitpoint we move along the triangle
   // normal instead.
-  if (disp.norm2() > GEOM_EPSILON_2) {
+  if (disp.norm2() > geom::EPSILON_2) {
     double n = disp.norm();
     auto disp_n = (1.0 / n) * disp;
-    hitPoint += GEOM_EPSILON * disp_n;
-    disp = (n - GEOM_EPSILON) * disp_n;
+    hitPoint += geom::EPSILON * disp_n;
+    disp = (n - geom::EPSILON) * disp_n;
   } else {
     double side = (disp_rem * m->n_norm) > 0 ? -1 : 1;
-    hitPoint += side * GEOM_EPSILON * m->n_norm;
+    hitPoint += side * geom::EPSILON * m->n_norm;
   }
   mol.moveTo(hitPoint);
   return 1;

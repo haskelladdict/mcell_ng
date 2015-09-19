@@ -70,6 +70,10 @@ public:
 };
 
 
+// utility typedefs
+using SizeTVec = Rvector<size_t>;
+
+
 // operator<< for Rvector for debugging purposes
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Rvector<T>& rvec) {

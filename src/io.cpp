@@ -85,8 +85,8 @@ static bool mcsf_file_check(const std::string& line) {
 }
 
 
-// mcsf_parse_verts extracts a single mesh vertex from a single tokenized line
-// of input. The line format is
+// mcsf_parse_verts extracts a single mesh vertex from a tokenized line
+// of mcsf input. The line format is
 // Node-ID  Chrt        X-Coordinate        Y-coordinate        Z-coordinate
 static void mcsf_parse_vert(const Rvector<std::string>& items, Rvector<Vec3>& verts) {
   assert(items.size() == 5);
@@ -96,8 +96,8 @@ static void mcsf_parse_vert(const Rvector<std::string>& items, Rvector<Vec3>& ve
 }
 
 
-// mcsf_parse_smplx extracts a single tetrahedron from a single tokenized line
-// of input. The line format is
+// mcsf_parse_smplx extracts a single tetrahedron from a tokenized line
+// of mcsf input. The line format is
 // Simp-ID Grp    Mat          Face-Types                      Vertex-Numbers
 static void mcsf_parse_smplx(const Rvector<std::string>& items,
   Rvector<Rvector<size_t>>& tetVerts) {
@@ -123,12 +123,12 @@ static std::string compute_mesh_key(Rvector<size_t> verts) {
 
 
 // mark_tet_neighbors marks the two tetrahdra with ID tet1 and tet2 as being
-// neighbors across mesh element with ID meshID
-void mark_tet_neighbors(Tets& tets, size_t tet1ID, size_t tet2ID, size_t meshID) {
+// neighbors across the triangle with meshID
+void mark_tet_neighbors(geom::Tets& tets, size_t tet1ID, size_t tet2ID, size_t meshID) {
   assert(tet1ID < tets.size());
   assert(tet2ID < tets.size());
 
-  Tet& tet1 = tets[tet1ID];
+  geom::Tet& tet1 = tets[tet1ID];
   for (size_t i=0; i < tet1.m.size(); ++i) {
     if (tet1.m[i] == meshID) {
       tet1.t[i] = tet2ID;
@@ -137,7 +137,7 @@ void mark_tet_neighbors(Tets& tets, size_t tet1ID, size_t tet2ID, size_t meshID)
     assert(true);  // should never get here
   }
 
-  Tet& tet2 = tets[tet2ID];
+  geom::Tet& tet2 = tets[tet2ID];
   for (size_t i=0; i < tet2.m.size(); ++i) {
     if (tet2.m[i] == meshID) {
       tet2.t[i] = tet1ID;
@@ -152,46 +152,41 @@ void mark_tet_neighbors(Tets& tets, size_t tet1ID, size_t tet2ID, size_t meshID)
 // The proper mesh orientation for each of a tetrahedron's 4 consititutive
 // triangles is determined according to tetgen's vertex numbering shown in
 // http://wias-berlin.de/software/tetgen/fformats.ele.html
-static void create_tets(const Rvector<Vec3>& verts,
-  const Rvector<Rvector<size_t>>& tetVerts, Mesh& mesh, Tets& tets) {
+static void create_tets(const Rvector<Vec3>& verts, const Rvector<SizeTVec>& tetVerts,
+  geom::Mesh& mesh, geom::Tets& tets) {
   assert(mesh.size() == 0);
   assert(tets.size() == 0);
 
-  // these are the vertex indices of all triangles which are part of a tet
-  Rvector<Rvector<size_t>> tetFaces{Rvector<size_t>{0, 2, 1}
-                                   ,Rvector<size_t>{0, 1, 3}
-                                   ,Rvector<size_t>{1, 2, 3}
-                                   ,Rvector<size_t>{2, 0, 3}};
-
-  std::unordered_map<std::string, size_t> triangleMap; // map triangles to their index
-  std::unordered_map<size_t, Rvector<size_t>> tetMap;  // map triangles to parent tets
+  std::unordered_map<std::string, size_t> triangleMap; // map triangle keys to their index
+  std::unordered_map<size_t, SizeTVec> tetMap;  // map a triangle index to parent tets
 
   // for each tet, extract the consititutive triangles, and either create new
   // MeshElements for them or retrieve the index of existing ones. Tets are then
   // assigned the proper indices and orientations of the triangles.
   size_t meshID = 0;
-  for (size_t t = 0; t < tetVerts.size(); ++t) {
-    const auto& v = tetVerts[t];
-    Tet tet;
-    for (size_t fc = 0; fc < tetFaces.size(); ++fc) {
-      const auto& f = tetFaces[fc];
+  size_t tetID = 0;
+  for (const auto& v : tetVerts) {
+    geom::Tet tet;
+    size_t faceID = 0;
+    for (const auto& f : geom::tetFaces) {
       Rvector<size_t> triangle{v[f[0]], v[f[1]], v[f[2]]};
       std::string key = compute_mesh_key(triangle);
       if (triangleMap.find(key) == triangleMap.end()) {
         triangleMap[key] = meshID;
-        tetMap[meshID].push_back(t);
-        mesh.emplace_back(MeshElement{verts[triangle[0]]
-                                     ,verts[triangle[1]]
-                                     ,verts[triangle[2]]});
-        tet.m[fc] = meshID;
-        tet.o[fc] = 1;
+        tetMap[meshID].push_back(tetID++);
+        mesh.emplace_back(geom::MeshElement{verts[triangle[0]]
+                                           ,verts[triangle[1]]
+                                           ,verts[triangle[2]]});
+        tet.m[faceID] = meshID;
+        tet.o[faceID] = 1;
         meshID++;
       } else {
         size_t id = triangleMap[key];
-        tet.m[fc] = id;
-        tet.o[fc] = -1;
-        tetMap[id].push_back(t);
+        tet.m[faceID] = id;
+        tet.o[faceID] = -1;
+        tetMap[id].push_back(tetID++);
       }
+      faceID++;
     }
     tets.emplace_back(tet);
   }
@@ -207,7 +202,7 @@ static void create_tets(const Rvector<Vec3>& verts,
 
 // parse_mcsf_tet_mesh parses an MCSF file containing a tet mesh and creates
 // and returns an internal representation of the mesh.
-Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets) {
+Error parse_mcsf_tet_mesh(const std::string& fileName, geom::Mesh& mesh, geom::Tets& tets) {
 
   std::ifstream file(fileName);
   if (!file.is_open()) {
@@ -224,7 +219,7 @@ Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets) {
   size_t numVerts = 0;
   size_t numSimplx = 0;
   Rvector<Vec3> verts;
-  Rvector<Rvector<size_t>> tetVerts;
+  Rvector<SizeTVec> tetVerts;
   // need a try block since string to integer/double conversion might throw
   try {
     while(getline(file, line)) {

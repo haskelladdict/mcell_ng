@@ -5,8 +5,9 @@
 
 #include "geometry.hpp"
 
+
 // MeshElement constructor
-MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
+geom::MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
   MeshProp prop) : a{av}, b{bv}, c{cv}, prop_{prop} {
 
   u = b - a;
@@ -15,41 +16,6 @@ MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
   n_norm = normalize(n);
 }
 
-#if 0
-// helper function for creating a rectangular geometry primitive
-Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshProp prop) {
-
-  // for rectangle to be well formed llc needs to be smaller than urc for x, y and z
-  assert(llc.x < urc.x && llc.y < urc.y && llc.z < urc.z);
-
-  Vec3 diag = urc - llc;
-
-  auto v0 = Vec3{llc};
-  auto v1 = Vec3{llc} + Vec3{diag.x, 0.0, 0.0};
-  auto v2 = Vec3{llc} + Vec3{0.0, diag.y, 0.0};
-  auto v3 = Vec3{llc} + Vec3{0.0, 0.0, diag.z};
-  auto v4 = Vec3{llc} + Vec3{diag.x, diag.y, 0.0};
-  auto v5 = Vec3{llc} + Vec3{diag.x, 0.0, diag.z};
-  auto v6 = Vec3{llc} + Vec3{0.0, diag.y, diag.z};
-  auto v7 = Vec3{urc};
-
-  Mesh mesh;
-  mesh.reserve(8);
-  mesh.emplace_back(MeshElement(v0, v1, v5, prop));
-  mesh.emplace_back(MeshElement(v0, v5, v3, prop));
-  mesh.emplace_back(MeshElement(v1, v4, v7, prop));
-  mesh.emplace_back(MeshElement(v1, v7, v5, prop));
-  mesh.emplace_back(MeshElement(v4, v2, v6, prop));
-  mesh.emplace_back(MeshElement(v4, v6, v7, prop));
-  mesh.emplace_back(MeshElement(v2, v0, v3, prop));
-  mesh.emplace_back(MeshElement(v2, v3, v6, prop));
-  mesh.emplace_back(MeshElement(v5, v7, v6, prop));
-  mesh.emplace_back(MeshElement(v5, v6, v3, prop));
-  mesh.emplace_back(MeshElement(v0, v2, v1, prop));
-  mesh.emplace_back(MeshElement(v1, v2, v4, prop));
-  return mesh;
-}
-#endif
 
 // intersect tests for ray triangle intersections. Possible return values are
 //  0: triangle and ray segment intersect, in this case hitPoint contains the
@@ -61,7 +27,7 @@ Mesh create_rectangle(const Vec3& llc, const Vec3& urc, MeshProp prop) {
 //
 // NOTE: This function was adapted from Dan Sunday
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
-int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
+int geom::intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   Vec3* hitPoint) {
 
   // if the normal vector is zero triangle is degenerate
@@ -74,7 +40,7 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   Vec3 w0 = p0 - m.a;
   double a = -(m.n * w0);
   double b = m.n * disp;
-  if (fabs(b) < GEOM_EPSILON) {  // our ray is parallel to triangle plane
+  if (fabs(b) < EPSILON) {  // our ray is parallel to triangle plane
     if (same(a, 0.0)) { // our ray is coplanar with the triangle
       return 3;
     } else {

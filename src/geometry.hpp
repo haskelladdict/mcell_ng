@@ -13,12 +13,13 @@
 #include "species.hpp"
 #include "util.hpp"
 
+namespace geom {
 
 // this epsilon is used for geometrical comparison. Anything smaller than that
 // is assumed to be identical.
 // FIXME: This is currently chosen arbitrarily and requires more thinking.
-const double GEOM_EPSILON = 1e-12;
-const double GEOM_EPSILON_2 = 1e-24;
+const double EPSILON = 1e-12;
+const double EPSILON_2 = 1e-24;
 
 
 // MeshProp describe properties of MeshElements. Each MeshElement can only have
@@ -94,8 +95,15 @@ public:
   //  1 indicates normal out, -1 normal in
   std::array<int, 4> o{{0, 0, 0, 0 }};
 };
-
 using Tets = Rvector<Tet>;
 
+// tetFaces lists the indices of all triangles that make up the four
+// faces of a tet
+const Rvector<Rvector<size_t>> tetFaces{Rvector<size_t>{0, 2, 1}
+                                       ,Rvector<size_t>{0, 1, 3}
+                                       ,Rvector<size_t>{1, 2, 3}
+                                       ,Rvector<size_t>{2, 0, 3}};
+
+}
 
 #endif

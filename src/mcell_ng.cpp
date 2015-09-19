@@ -25,8 +25,8 @@ int main() {
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
-  Mesh m;
-  Tets t;
+  geom::Mesh m;
+  geom::Tets t;
   //std::string meshFile = "../mcell_ng_trunk/tests/cube.m";
   std::string meshFile = "../mcell_ng_trunk/tests/sphere.m";
   auto e = parse_mcsf_tet_mesh(meshFile, m, t);

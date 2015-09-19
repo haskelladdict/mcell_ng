@@ -32,9 +32,9 @@ public:
   }
 
   // mesh related functionality
-  void add_mesh(const Mesh& mesh);
+  void add_mesh(const geom::Mesh& mesh);
 
-  const Mesh& get_mesh() const {
+  const geom::Mesh& get_mesh() const {
     return mesh_;
   }
 
@@ -55,7 +55,7 @@ private:
 
   mutable RngNorm rng_;
 
-  Mesh mesh_;
+  geom::Mesh mesh_;
   SpeciesContainer species_;
   VolMolMap volMolMap_;
 };

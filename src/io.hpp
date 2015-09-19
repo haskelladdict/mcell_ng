@@ -20,7 +20,7 @@ bool write_cellblender(State& state, std::string path, std::string name,
 
 // parse_mcsf_tet_mesh parses an MCSF file containing a tet mesh and creates
 // and returns an internal representation of the mesh.
-Error parse_mcsf_tet_mesh(const std::string& fileName, Mesh& mesh, Tets& tets);
+Error parse_mcsf_tet_mesh(const std::string& fileName, geom::Mesh& mesh, geom::Tets& tets);
 
 
 #endif
