@@ -37,7 +37,7 @@ int collide(const State& state, VolMol& mol, Vec3& disp) {
   }
 
   // reflect: Rr = Ri - 2 N (Ri * N)
-  disp = disp_rem - (2 * (disp_rem * m->n_norm())) * m->n_norm();
+  disp = disp_rem - (2 * (disp_rem * m->n_norm)) * m->n_norm;
 
   // move slightly away from the triangle along the reflected ray.
   // If we happen to end our ray at hitpoint we move along the triangle
@@ -48,8 +48,8 @@ int collide(const State& state, VolMol& mol, Vec3& disp) {
     hitPoint += GEOM_EPSILON * disp_n;
     disp = (n - GEOM_EPSILON) * disp_n;
   } else {
-    double side = (disp_rem * m->n_norm()) > 0 ? -1 : 1;
-    hitPoint += side * GEOM_EPSILON * m->n_norm();
+    double side = (disp_rem * m->n_norm) > 0 ? -1 : 1;
+    hitPoint += side * GEOM_EPSILON * m->n_norm;
   }
   mol.moveTo(hitPoint);
   return 1;

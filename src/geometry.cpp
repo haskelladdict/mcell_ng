@@ -6,13 +6,13 @@
 #include "geometry.hpp"
 
 // MeshElement constructor
-MeshElement::MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
-  MeshProp prop) : a_{a}, b_{b}, c_{c}, prop_{prop} {
+MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
+  MeshProp prop) : a{av}, b{bv}, c{cv}, prop_{prop} {
 
-  u_ = b - a;
-  v_ = c - a;
-  n_ = cross(u_, v_);
-  nn_ = normalize(n_);
+  u = b - a;
+  v = c - a;
+  n = cross(u, v);
+  n_norm = normalize(n);
 }
 
 #if 0
@@ -65,15 +65,15 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   Vec3* hitPoint) {
 
   // if the normal vector is zero triangle is degenerate
-  if (same(m.n().x, 0.0) && same(m.n().y, 0.0) && same(m.n().z, 0.0)) {
+  if (same(m.n.x, 0.0) && same(m.n.y, 0.0) && same(m.n.z, 0.0)) {
     return 4;
   }
 
   // compute intersection of ray from p0 along disp with plane in which m is
   // located
-  Vec3 w0 = p0 - m.a();
-  double a = -(m.n() * w0);
-  double b = m.n() * disp;
+  Vec3 w0 = p0 - m.a;
+  double a = -(m.n * w0);
+  double b = m.n * disp;
   if (fabs(b) < GEOM_EPSILON) {  // our ray is parallel to triangle plane
     if (same(a, 0.0)) { // our ray is coplanar with the triangle
       return 3;
@@ -92,9 +92,9 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
 
   // now test that hitPoint is within the triangle
   // we use local variable for efficiency
-  Vec3 w = *hitPoint - m.a();
-  Vec3 u = m.u();
-  Vec3 v = m.v();
+  Vec3 w = *hitPoint - m.a;
+  Vec3 u = m.u;
+  Vec3 v = m.v;
   double uu = u * u;
   double uv = u * v;
   double vv = v * v;

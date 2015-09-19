@@ -43,44 +43,12 @@ public:
   MeshElement(const Vec3& a, const Vec3& b, const Vec3& c,
     MeshProp prop = MeshProp::transparent);
 
-  const Vec3& a() const {
-    return a_;
-  }
-
-  const Vec3& b() const {
-    return b_;
-  }
-
-  const Vec3& c() const {
-    return c_;
-  }
-
-  const Vec3& u() const {
-    return u_;
-  }
-
-  const Vec3& v() const {
-    return v_;
-  }
-
-  const Vec3& n() const {
-    return n_;
-  }
-
-  const Vec3& n_norm() const {
-    return nn_;
-  }
-
-  MeshProp prop() const {
-    return prop_;
-  }
+  Vec3 a, b, c;   // triangle vertices
+  Vec3 u, v;      // triangle vectors
+  Vec3 n;         // normal vector
+  Vec3 n_norm;    // normalized normal vector - precomputed for efficiency
 
 private:
-
-  Vec3 a_, b_, c_; // triangle vertices
-  Vec3 u_, v_;     // triangle vectors
-  Vec3 n_;         // normal vector
-  Vec3 nn_;        // normalized normal vector - precomputed for efficiency
   MeshProp prop_;  // properties of this element
 };
 
