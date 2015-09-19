@@ -173,7 +173,7 @@ static void create_tets(const Rvector<Vec3>& verts, const Rvector<SizeTVec>& tet
       std::string key = compute_mesh_key(triangle);
       if (triangleMap.find(key) == triangleMap.end()) {
         triangleMap[key] = meshID;
-        tetMap[meshID].push_back(tetID++);
+        tetMap[meshID].push_back(tetID);
         mesh.emplace_back(geom::MeshElement{verts[triangle[0]]
                                            ,verts[triangle[1]]
                                            ,verts[triangle[2]]});
@@ -184,12 +184,14 @@ static void create_tets(const Rvector<Vec3>& verts, const Rvector<SizeTVec>& tet
         size_t id = triangleMap[key];
         tet.m[faceID] = id;
         tet.o[faceID] = -1;
-        tetMap[id].push_back(tetID++);
+        tetMap[id].push_back(tetID);
       }
       faceID++;
     }
+    tetID++;
     tets.emplace_back(tet);
   }
+
   // connect shared tets across shared faces
   for (const auto& m : tetMap) {
     assert(m.second.size() == 2 || m.second.size() == 1);

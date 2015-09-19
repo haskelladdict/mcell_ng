@@ -79,11 +79,9 @@ int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
 // be oriented with their normal to the outside or with their normal to the
 // inside (indicated by o1, o2, ... o4). If they are oriented normal in we have
 // to take that into account when checking for collisions.
-class Tet {
+struct Tet {
 
-public:
-
-  const size_t unset = std::numeric_limits<size_t>::max();
+  const static size_t unset = std::numeric_limits<size_t>::max();
 
   // indices of MeshElements
   std::array<size_t, 4> m{{unset, unset, unset, unset}};
