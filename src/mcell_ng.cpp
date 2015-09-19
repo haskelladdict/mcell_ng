@@ -25,15 +25,17 @@ int main() {
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
   State state;
 
-  geom::Mesh m;
-  geom::Tets t;
+  geom::Mesh mesh;
+  geom::Tets tets;
   std::string meshFile = "../mcell_ng_trunk/tests/cube.mcsf";
   //std::string meshFile = "../mcell_ng_trunk/tests/sphere.mcsf";
-  auto e = parse_mcsf_tet_mesh(meshFile, m, t);
+  auto e = parse_mcsf_tet_mesh(meshFile, mesh, tets);
   if (e.err) {
     cerr << e.desc << endl;
     exit(1);
   }
+
+  state.add_geometry(std::move(mesh), std::move(tets));
 
 #if 0
   MeshPropPtr prop1 = std::make_shared<MeshProp>();
@@ -61,12 +63,12 @@ int main() {
 
   e = write_cellblender(state, outDir, "test", 0);
   if (e.err) {
-    std::cerr << "write_cellblender: " << e.desc << endl;
+    cerr << "write_cellblender: " << e.desc << endl;
     exit(1);
   }
 
   // do a few diffusion steps
-  for (int i=1; i < 2; ++i) {
+  for (int i=1; i < 100; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
       for (auto& m : state.volMols()[spec.name()]) {
@@ -79,7 +81,7 @@ int main() {
     if (i % 10 == 0) {
       e = write_cellblender(state, outDir, "test", i);
       if (e.err) {
-        std::cerr << "write_cellblender :" << e.desc << endl;
+        cerr << "write_cellblender :" << e.desc << endl;
       }
     }
   }

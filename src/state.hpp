@@ -32,10 +32,14 @@ public:
   }
 
   // mesh related functionality
-  void add_mesh(const geom::Mesh& mesh);
+  void add_geometry(geom::Mesh&& mesh, geom::Tets&& tets);
 
   const geom::Mesh& get_mesh() const {
     return mesh_;
+  }
+
+  const geom::Mesh& get_tets() const {
+    return tets_;
   }
 
   MolSpecies* create_species(MolSpecies spec) {
@@ -56,6 +60,8 @@ private:
   mutable RngNorm rng_;
 
   geom::Mesh mesh_;
+  geom::Tets tets_;
+
   SpeciesContainer species_;
   VolMolMap volMolMap_;
 };

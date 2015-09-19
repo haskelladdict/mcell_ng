@@ -10,7 +10,10 @@
 State::State(uint64_t seed) : rng_{seed} {}
 
 
-// create_Mesh adds a new mesh object to the simulation
-void State::add_mesh(const geom::Mesh& m) {
-  mesh_.insert(mesh_.end(), m.begin(), m.end());
+// add_geometry adds the model geometry to the state. The model geometry is
+// defined by a list of tets (which define the topology) and a mesh which
+// keeps track of all the triangles making up the tets.
+void State::add_geometry(geom::Mesh&& mesh, geom::Tets&& tets) {
+  mesh_ = mesh;
+  tets_ = tets;
 }
