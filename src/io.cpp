@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include "io.hpp"
 #include "util.hpp"
@@ -17,21 +18,14 @@
 
 // write_cellblender writes the molecule info at iter to a file name in
 // cellblender format located at path.
-bool write_cellblender(State& state, std::string path, std::string name,
+Error write_cellblender(State& state, std::string path, std::string name,
   int iter) {
 
-  if (state.species().size() == 0) {
-    return false;
-  }
-
-  char fileName[256];
-  if (snprintf(fileName, 255, "%s/%s.cellbin.%04d.dat", path.c_str(),
-    name.c_str(), iter) < 0) {
-    return false;
-  }
+  std::string fileName = boost::str(boost::format("%s/%s.cellbin.%04d.dat") %
+    path.c_str() % name.c_str() % iter);
   std::ofstream out(fileName);
   if (out.fail()) {
-    return false;
+    return Error{"Failed to open file " + fileName};
   }
 
   // write version info
@@ -61,7 +55,7 @@ bool write_cellblender(State& state, std::string path, std::string name,
   }
   out.close();
 
-  return true;
+  return noErr;
 }
 
 

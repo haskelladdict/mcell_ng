@@ -46,11 +46,11 @@ int main() {
   auto cube2 = create_rectangle(Vec3{-0.01, -0.01, -0.01}, Vec3{0.01, 0.01, 0.01}, prop2);
   state.add_mesh(cube2);
 
+#endif
   auto aSpec = state.create_species(MolSpecies("A", 600));
   for (int i=0; i < 10000; ++i) {
     state.volMols().create(aSpec, Vec3{0.0,0.0,0.0});
   }
-#endif
 /*
   auto bID = state.species().create("B", 900);
   for (int i=0; i < 12000; ++i) {
@@ -59,13 +59,14 @@ int main() {
 */
 
 
-  if (!write_cellblender(state, outDir, "test", 0)) {
-    std::cerr << "failed to write output" << endl;
+  e = write_cellblender(state, outDir, "test", 0);
+  if (e.err) {
+    std::cerr << "write_cellblender: " << e.desc << endl;
+    exit(1);
   }
 
-
   // do a few diffusion steps
-  for (int i=1; i < 1; ++i) {
+  for (int i=1; i < 2; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
       for (auto& m : state.volMols()[spec.name()]) {
@@ -76,8 +77,9 @@ int main() {
     }
 
     if (i % 10 == 0) {
-      if (!write_cellblender(state, outDir, "test", i)) {
-        std::cerr << "failed to write output" << endl;
+      e = write_cellblender(state, outDir, "test", i);
+      if (e.err) {
+        std::cerr << "write_cellblender :" << e.desc << endl;
       }
     }
   }
