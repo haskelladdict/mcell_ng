@@ -9,9 +9,10 @@
 // Error is a small helper struct for returning errors. It consists of a bool
 // indicating that an error occured as well as a string describing the error.
 struct Error {
+  Error() {};
   explicit Error(std::string d, bool e = true) : err(e), desc(d) {};
 
-  bool err;
+  bool err = true;
   std::string desc;
 };
 

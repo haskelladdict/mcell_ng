@@ -27,9 +27,10 @@ int main() {
 
   geom::Mesh mesh;
   geom::Tets tets;
+  Error e;
   std::string meshFile = "../mcell_ng_trunk/tests/cube.mcsf";
   //std::string meshFile = "../mcell_ng_trunk/tests/sphere.mcsf";
-  auto e = parse_mcsf_tet_mesh(meshFile, mesh, tets);
+  std::tie(mesh, tets, e) = parse_mcsf_tet_mesh(meshFile);
   if (e.err) {
     cerr << e.desc << endl;
     exit(1);
@@ -51,7 +52,7 @@ int main() {
 #endif
   auto aSpec = state.create_species(MolSpecies("A", 600));
   for (int i=0; i < 10000; ++i) {
-    state.volMols().create(aSpec, geom::Vec3{});
+    state.volMols().create(aSpec, geom::Vec3{-0.000001,0.0,0.0});
   }
 /*
   auto bID = state.species().create("B", 900);
@@ -68,7 +69,7 @@ int main() {
   }
 
   // do a few diffusion steps
-  for (int i=1; i < 100; ++i) {
+  for (int i=1; i < 500; ++i) {
     cout << "iteration:   " << i << endl;
     for (auto& spec : state.species()) {
       for (auto& m : state.volMols()[spec.name()]) {

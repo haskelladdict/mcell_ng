@@ -147,10 +147,8 @@ void mark_tet_neighbors(geom::Tets& tets, size_t tet1ID, size_t tet2ID, size_t m
 // The proper mesh orientation for each of a tetrahedron's 4 consititutive
 // triangles is determined according to tetgen's vertex numbering shown in
 // http://wias-berlin.de/software/tetgen/fformats.ele.html
-static void create_tets(const Rvector<geom::Vec3>& verts,
-  const Rvector<SizeTVec>& tetVerts, geom::Mesh& mesh, geom::Tets& tets) {
-  assert(mesh.size() == 0);
-  assert(tets.size() == 0);
+static std::tuple<geom::Mesh, geom::Tets> create_tets(const Rvector<geom::Vec3>& verts,
+  const Rvector<SizeTVec>& tetVerts) {
 
   std::unordered_map<std::string, size_t> triangleMap; // map triangle keys to their index
   std::unordered_map<size_t, SizeTVec> tetMap;  // map a triangle index to parent tets
@@ -160,6 +158,8 @@ static void create_tets(const Rvector<geom::Vec3>& verts,
   // assigned the proper indices and orientations of the triangles.
   size_t meshID = 0;
   size_t tetID = 0;
+  geom::Mesh mesh;
+  geom::Tets tets;
   for (const auto& v : tetVerts) {
     geom::Tet tet;
     size_t faceID = 0;
@@ -194,21 +194,24 @@ static void create_tets(const Rvector<geom::Vec3>& verts,
       mark_tet_neighbors(tets, m.second[0], m.second[1], m.first);
     }
   }
+  return make_tuple(mesh, tets);
 }
 
 
 // parse_mcsf_tet_mesh parses an MCSF file containing a tet mesh and creates
 // and returns an internal representation of the mesh.
-Error parse_mcsf_tet_mesh(const std::string& fileName, geom::Mesh& mesh, geom::Tets& tets) {
+std::tuple<geom::Mesh, geom::Tets, Error> parse_mcsf_tet_mesh(const std::string& fileName) {
 
   std::ifstream file(fileName);
   if (!file.is_open()) {
-    return Error{"failed to open file " + fileName};
+    return make_tuple(geom::Mesh{}, geom::Tets{},
+      Error{"failed to open file " + fileName});
   }
 
   std::string line;
   if (!getline(file, line) || !mcsf_file_check(line)) {
-    return Error{fileName + "is not an mcsf mesh file"};
+    return make_tuple(geom::Mesh{}, geom::Tets{},
+      Error{fileName + "is not an mcsf mesh file"});
   }
 
   bool inVerts = false;
@@ -249,11 +252,13 @@ Error parse_mcsf_tet_mesh(const std::string& fileName, geom::Mesh& mesh, geom::T
       }
     }
   } catch (std::invalid_argument& e) {
-    return Error("could not parse mcsf file");
+    return make_tuple(geom::Mesh{}, geom::Tets{}, Error{"could not parse mcsf file"});
   }
   assert(verts.size() == numVerts);
   assert(tetVerts.size() == numSimplx);
-  create_tets(verts, tetVerts, mesh, tets);
 
-  return noErr;
+  geom::Mesh mesh;
+  geom::Tets tets;
+  std::tie(mesh, tets) = create_tets(verts, tetVerts);
+  return make_tuple(mesh, tets, noErr);
 }
