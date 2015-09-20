@@ -83,6 +83,11 @@ struct Tet {
 
   const static size_t unset = std::numeric_limits<size_t>::max();
 
+  Tet(size_t i) : ID(i) {}
+
+  // our index
+  size_t ID;
+
   // indices of MeshElements
   std::array<size_t, 4> m{{unset, unset, unset, unset}};
 
@@ -92,9 +97,6 @@ struct Tet {
   // orientation of MeshElements with respect to Tet;
   //  1 indicates normal out, -1 normal in
   std::array<int, 4> o{{0, 0, 0, 0 }};
-
-  // molecules located in this tet
-  VolMolContainer volMols;
 };
 
 using Tets = Rvector<Tet>;

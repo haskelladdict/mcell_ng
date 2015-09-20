@@ -29,7 +29,7 @@ public:
 
 private:
   const MolSpecies* spec_;  // what species are we
-  double t_;     // birthday
+  double t_;                // birthday
 };
 
 
@@ -63,7 +63,7 @@ public:
   using Rvector<T>::Rvector;
   using iter = typename Rvector<T>::iterator;
 
-  iter remove(iter pos) {
+  iter erase(iter pos) {
     auto last = Rvector<T>::end() - 1;
     if (pos != last) {
       std::swap(*pos, *last);
@@ -79,22 +79,38 @@ using VolMolContainer = MolContainer<VolMol>;
 class VolMolMap {
 
 public:
-
   using mapped_type = std::unordered_map<std::string, VolMolContainer>::mapped_type;
 
-  VolMol& create(const MolSpecies *spec, const geom::Vec3& pos, double t = 0.0);
+  // add an existing VolMol and take possession
+  void add(VolMol&& volMol);
+
+  // delete a volume molecule
   bool del(VolMol& mol);
 
   mapped_type& operator[](std::string specName) {
     return volMolMap_[specName];
   }
 
-
 private:
 
   std::unordered_map<std::string, VolMolContainer> volMolMap_;
 };
 
+
+// MolState keeps track of all molecules within a tet
+struct MolState {
+
+  // active molecules located in this tet
+  VolMolMap activeMols;
+
+  // molecules enterting this tet (from neighboring tets)
+  VolMolContainer inMols;
+
+  // molecules leaving this tet for one of the four neighbors
+  Rvector<VolMolContainer> outMols{4};
+};
+
+using TetMols = Rvector<MolState>;
 
 
 #endif

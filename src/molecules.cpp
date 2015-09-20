@@ -26,16 +26,13 @@ void VolMol::moveTo(const geom::Vec3& to) {
 }
 
 
-// create adds a new volume molecule to the VolMolMap
-VolMol& VolMolMap::create(const MolSpecies *spec, const geom::Vec3& pos, double t) {
-  VolMol vm(spec, pos, t);
-  auto specName = spec->name();
+// add an existing VolMol and takes possession
+void VolMolMap::add(VolMol&& mol) {
+  auto specName = mol.spec()->name();
   if (volMolMap_.find(specName) == volMolMap_.end()) {
     volMolMap_[specName] = VolMolContainer{};
   }
-  volMolMap_[specName].emplace_back(std::move(vm));
-  size_t index = volMolMap_[specName].size() - 1;
-  return volMolMap_[specName][index];
+  volMolMap_[specName].emplace_back(mol);
 }
 
 

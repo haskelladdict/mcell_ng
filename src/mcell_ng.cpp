@@ -38,21 +38,11 @@ int main() {
 
   state.add_geometry(mesh, tets);
 
-#if 0
-  MeshPropPtr prop1 = std::make_shared<MeshProp>();
-  prop1->name = "cube1";
-  auto cube1 = create_rectangle(Vec3{-0.1, -0.1, -0.1}, Vec3{0.1, 0.1, 0.1}, prop1);
-  state.add_mesh(cube1);
-
-  MeshPropPtr prop2 = std::make_shared<MeshProp>();
-  prop2->name = "cube2";
-  auto cube2 = create_rectangle(Vec3{-0.01, -0.01, -0.01}, Vec3{0.01, 0.01, 0.01}, prop2);
-  state.add_mesh(cube2);
-
-#endif
   auto aSpec = state.create_species(MolSpecies("A", 600));
+  auto mols = state.tetMols()[0];
   for (int i=0; i < 10000; ++i) {
-    state.volMols().create(aSpec, geom::Vec3{-0.000001,0.0,0.0});
+    VolMol mol{aSpec, geom::Vec3{-0.000001,0.0,0.0}, 0.0};
+    mols.activeMols.add(std::move(mol));
   }
 /*
   auto bID = state.species().create("B", 900);
@@ -61,7 +51,6 @@ int main() {
   }
 */
 
-
   e = write_cellblender(state, outDir, "test", 0);
   if (e.err) {
     cerr << "write_cellblender: " << e.desc << endl;
@@ -69,8 +58,14 @@ int main() {
   }
 
   // do a few diffusion steps
+  auto tetMols = state.tetMols();
   for (int i=1; i < 10; ++i) {
     cout << "iteration:   " << i << endl;
+    for (const auto& tet : state.tets()) {
+      cout << "the tet" << endl;
+      process_tet(tet, mesh, tetMols);
+    }
+#if 0
     for (auto& spec : state.species()) {
       for (auto& m : state.volMols()[spec.name()]) {
         if (!diffuse(state, spec, m, dt)) {
@@ -78,6 +73,7 @@ int main() {
         }
       }
     }
+#endif
 
     if (i % 10 == 0) {
       e = write_cellblender(state, outDir, "test", i);

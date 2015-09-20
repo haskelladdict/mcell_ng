@@ -30,7 +30,7 @@ Error write_cellblender(State& state, std::string path, std::string name,
   // write version info
   unsigned int version = 1;
   out.write(reinterpret_cast<char*>(&version), sizeof(uint32_t));
-
+#if 0
   // write molecule info
   for (auto& spec : state.species()) {
     unsigned char length = spec.name().length();
@@ -53,7 +53,7 @@ Error write_cellblender(State& state, std::string path, std::string name,
     }
   }
   out.close();
-
+#endif
   return noErr;
 }
 
@@ -160,7 +160,7 @@ static std::tuple<geom::Mesh, geom::Tets> create_tets(const Rvector<geom::Vec3>&
   geom::Mesh mesh;
   geom::Tets tets;
   for (const auto& v : tetVerts) {
-    geom::Tet tet;
+    geom::Tet tet(tetID);
     size_t faceID = 0;
     for (const auto& f : geom::tetFaces) {
       Rvector<size_t> triangle{v[f[0]], v[f[1]], v[f[2]]};

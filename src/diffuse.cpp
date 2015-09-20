@@ -70,3 +70,36 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
   }
   return true;
 }
+
+
+bool process_tet(const geom::Tet& tet, const geom::Mesh& mesh, TetMols& mols) {
+  // add all incoming molecules into active queue
+  auto& active = mols[tet.ID].activeMols;
+  auto& incoming = mols[tet.ID].inMols;
+  for (auto&& m: incoming) {
+    active.add(std::move(m));
+  }
+  incoming.clear();
+
+
+  // actual processing comes here
+
+
+  // play all outgoing molecules into the neighboring tets
+  auto& outgoing = mols[tet.ID].outMols;
+  for (size_t i=0; i < outgoing.size(); ++i) {
+    auto& out = outgoing[i];
+    if (out.size() == 0) {
+      continue;
+    }
+    size_t targetID = tet.t[i];
+    assert(targetID != geom::Tet::unset);
+    auto& target = mols[targetID].inMols;
+    for (auto&& m : out) {
+      target.emplace_back(std::move(m));
+    }
+    target.clear();
+  }
+
+  return true;
+}

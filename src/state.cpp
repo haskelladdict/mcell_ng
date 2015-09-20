@@ -16,4 +16,7 @@ State::State(uint64_t seed) : rng_{seed} {}
 void State::add_geometry(const geom::Mesh& mesh, const geom::Tets& tets) {
   mesh_ = mesh;
   tets_ = tets;
+
+  // initialize the per tet MolState
+  tetMols_ = TetMols{tets_.size()};
 }

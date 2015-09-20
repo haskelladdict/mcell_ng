@@ -38,8 +38,12 @@ public:
     return mesh_;
   }
 
-  const geom::Tets& get_tets() const {
+  const geom::Tets& tets() const {
     return tets_;
+  }
+
+  TetMols& tetMols() {
+    return tetMols_;
   }
 
   MolSpecies* create_species(MolSpecies spec) {
@@ -51,19 +55,20 @@ public:
     return species_;
   }
 
+/*
   VolMolMap& volMols() {
     return volMolMap_;
   }
-
+*/
 private:
 
   mutable RngNorm rng_;
 
   geom::Mesh mesh_;
   geom::Tets tets_;
+  TetMols tetMols_;
 
   SpeciesContainer species_;
-  VolMolMap volMolMap_;
 };
 
 #endif
