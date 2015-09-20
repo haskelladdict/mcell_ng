@@ -10,5 +10,5 @@ if(Boost_FOUND)
     rng.cpp 
     species.cpp 
     state.cpp
-    util.cpp)
+    )
 endif()
