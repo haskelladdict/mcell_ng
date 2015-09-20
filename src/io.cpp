@@ -82,11 +82,12 @@ static bool mcsf_file_check(const std::string& line) {
 // mcsf_parse_verts extracts a single mesh vertex from a tokenized line
 // of mcsf input. The line format is
 // Node-ID  Chrt        X-Coordinate        Y-coordinate        Z-coordinate
-static void mcsf_parse_vert(const Rvector<std::string>& items, Rvector<Vec3>& verts) {
+static void mcsf_parse_vert(const Rvector<std::string>& items,
+  Rvector<geom::Vec3>& verts) {
   assert(items.size() == 5);
-  verts.emplace_back(Vec3{std::stod(items[2])
-                         ,std::stod(items[3])
-                         ,std::stod(items[4])});
+  verts.emplace_back(geom::Vec3{std::stod(items[2])
+                               ,std::stod(items[3])
+                               ,std::stod(items[4])});
 }
 
 
@@ -146,8 +147,8 @@ void mark_tet_neighbors(geom::Tets& tets, size_t tet1ID, size_t tet2ID, size_t m
 // The proper mesh orientation for each of a tetrahedron's 4 consititutive
 // triangles is determined according to tetgen's vertex numbering shown in
 // http://wias-berlin.de/software/tetgen/fformats.ele.html
-static void create_tets(const Rvector<Vec3>& verts, const Rvector<SizeTVec>& tetVerts,
-  geom::Mesh& mesh, geom::Tets& tets) {
+static void create_tets(const Rvector<geom::Vec3>& verts,
+  const Rvector<SizeTVec>& tetVerts, geom::Mesh& mesh, geom::Tets& tets) {
   assert(mesh.size() == 0);
   assert(tets.size() == 0);
 
@@ -214,7 +215,7 @@ Error parse_mcsf_tet_mesh(const std::string& fileName, geom::Mesh& mesh, geom::T
   bool inSmplx = false;
   size_t numVerts = 0;
   size_t numSimplx = 0;
-  Rvector<Vec3> verts;
+  Rvector<geom::Vec3> verts;
   Rvector<SizeTVec> tetVerts;
   // need a try block since string to integer/double conversion might throw
   try {

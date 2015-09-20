@@ -2,6 +2,7 @@
 // Licensed under BSD license, see LICENSE file for details
 
 #include <cassert>
+#include <stdexcept>
 
 #include "geometry.hpp"
 
@@ -13,6 +14,9 @@ geom::MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
   u = b - a;
   v = c - a;
   n = cross(u, v);
+  if (n == geom::Vec3{}) {
+    throw std::runtime_error("encountered degenerate MeshElement");
+  }
   n_norm = normalize(n);
 }
 
@@ -29,11 +33,6 @@ geom::MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
 int geom::intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
   Vec3* hitPoint) {
-
-  // if the normal vector is zero triangle is degenerate
-  if (same(m.n.x, 0.0) && same(m.n.y, 0.0) && same(m.n.z, 0.0)) {
-    return 4;
-  }
 
   // compute intersection of ray from p0 along disp with plane in which m is
   // located

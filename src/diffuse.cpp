@@ -5,24 +5,23 @@
 #include <cmath>
 
 #include "diffuse.hpp"
-#include "util.hpp"
 
 
 // collide determines the closes mesh element along the displacement vector
 // (if any) and the corresponding hitpoint on the mesh
-int collide(const State& state, VolMol& mol, Vec3& disp) {
+int collide(const State& state, VolMol& mol, geom::Vec3& disp) {
 
-  Vec3 hitPoint;
-  Vec3 disp_rem;
+  geom::Vec3 hitPoint;
+  geom::Vec3 disp_rem;
 
   const auto& mesh = state.get_mesh();
   geom::Mesh::const_iterator m = mesh.end();
   double disp_len2 = std::numeric_limits<float>::max();
   for (geom::Mesh::const_iterator it = mesh.begin(); it != mesh.end(); ++it) {
-    Vec3 hitPoint_tmp;
+    geom::Vec3 hitPoint_tmp;
     if (intersect(mol.pos(), disp, *it, &hitPoint_tmp) == 0) {
-      Vec3 rem = hitPoint_tmp - mol.pos();
-      double rem_len2 = rem.norm2();
+      geom::Vec3 rem = hitPoint_tmp - mol.pos();
+      double rem_len2 = norm2(rem);
       if (rem_len2 < disp_len2) {
         hitPoint = hitPoint_tmp;
         disp_rem = rem;
@@ -42,8 +41,8 @@ int collide(const State& state, VolMol& mol, Vec3& disp) {
   // move slightly away from the triangle along the reflected ray.
   // If we happen to end our ray at hitpoint we move along the triangle
   // normal instead.
-  if (disp.norm2() > geom::EPSILON_2) {
-    double n = disp.norm();
+  if (norm2(disp) > geom::EPSILON_2) {
+    double n = norm(disp);
     auto disp_n = (1.0 / n) * disp;
     hitPoint += geom::EPSILON * disp_n;
     disp = (n - geom::EPSILON) * disp_n;
@@ -60,12 +59,12 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 
   // compute displacement
   double scale = sqrt(4*spec.D()*dt);
-  Vec3 disp{scale * state.rng_norm(), scale * state.rng_norm(),
+  geom::Vec3 disp{scale * state.rng_norm(), scale * state.rng_norm(),
     scale * state.rng_norm()};
 
   // diffuse and collide until we're at the end of our diffusion step
   while (collide(state, mol, disp)) {}
-  if (disp.norm2() > 0) {
+  if (norm2(disp) > 0) {
     mol.moveTo(mol.pos() + disp);
   }
   return true;

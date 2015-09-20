@@ -16,18 +16,18 @@ Mol::~Mol() {};
 
 
 // VolMol constructor
-VolMol::VolMol(const MolSpecies *spec, const Vec3& pos, double t)
+VolMol::VolMol(const MolSpecies *spec, const geom::Vec3& pos, double t)
   : Mol(spec, t), pos_{pos} {}
 
 
 // moveTo moves the volume molecule to a new position
-void VolMol::moveTo(const Vec3& to) {
+void VolMol::moveTo(const geom::Vec3& to) {
   pos_ = to;
 }
 
 
 // create adds a new volume molecule to the VolMolMap
-VolMol& VolMolMap::create(const MolSpecies *spec, const Vec3& pos, double t) {
+VolMol& VolMolMap::create(const MolSpecies *spec, const geom::Vec3& pos, double t) {
   VolMol vm(spec, pos, t);
   auto specName = spec->name();
   if (volMolMap_.find(specName) == volMolMap_.end()) {

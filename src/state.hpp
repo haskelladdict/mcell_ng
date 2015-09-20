@@ -38,7 +38,7 @@ public:
     return mesh_;
   }
 
-  const geom::Mesh& get_tets() const {
+  const geom::Tets& get_tets() const {
     return tets_;
   }
 

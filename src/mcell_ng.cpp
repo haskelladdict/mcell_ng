@@ -51,7 +51,7 @@ int main() {
 #endif
   auto aSpec = state.create_species(MolSpecies("A", 600));
   for (int i=0; i < 10000; ++i) {
-    state.volMols().create(aSpec, Vec3{0.0,0.0,0.0});
+    state.volMols().create(aSpec, geom::Vec3{});
   }
 /*
   auto bID = state.species().create("B", 900);

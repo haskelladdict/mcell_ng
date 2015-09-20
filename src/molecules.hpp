@@ -7,8 +7,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include "geometry.hpp"
 #include "species.hpp"
-#include "util.hpp"
 
 // Mol is the abstract base class for describing 2D and 3D molecules
 class Mol {
@@ -38,17 +38,17 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(const MolSpecies* spec, const Vec3& pos, double t);
+  VolMol(const MolSpecies* spec, const geom::Vec3& pos, double t);
 
-  const Vec3& pos() const {
+  const geom::Vec3& pos() const noexcept {
     return pos_;
   }
 
-  void moveTo(const Vec3& to);
+  void moveTo(const geom::Vec3& to);
 
 
 private:
-  Vec3 pos_;
+  geom::Vec3 pos_;
 };
 using VolMolContainer = Rvector<VolMol>;
 
@@ -60,7 +60,7 @@ public:
 
   using mapped_type = std::unordered_map<std::string, VolMolContainer>::mapped_type;
 
-  VolMol& create(const MolSpecies *spec, const Vec3& pos, double t = 0.0);
+  VolMol& create(const MolSpecies *spec, const geom::Vec3& pos, double t = 0.0);
   bool del(VolMol& mol);
 
   mapped_type& operator[](std::string specName) {
@@ -76,5 +76,3 @@ private:
 
 
 #endif
-
-
