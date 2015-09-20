@@ -35,7 +35,7 @@ int main() {
     exit(1);
   }
 
-  state.add_geometry(std::move(mesh), std::move(tets));
+  state.add_geometry(mesh, tets);
 
 #if 0
   MeshPropPtr prop1 = std::make_shared<MeshProp>();

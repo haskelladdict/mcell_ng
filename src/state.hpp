@@ -32,7 +32,7 @@ public:
   }
 
   // mesh related functionality
-  void add_geometry(geom::Mesh&& mesh, geom::Tets&& tets);
+  void add_geometry(const geom::Mesh& mesh, const geom::Tets& tets);
 
   const geom::Mesh& get_mesh() const {
     return mesh_;
