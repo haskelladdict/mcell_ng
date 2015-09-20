@@ -7,8 +7,8 @@
 #include <memory>
 #include <unordered_map>
 
-#include "geometry.hpp"
 #include "species.hpp"
+#include "vector.hpp"
 
 // Mol is the abstract base class for describing 2D and 3D molecules
 class Mol {
@@ -50,7 +50,29 @@ public:
 private:
   geom::Vec3 pos_;
 };
-using VolMolContainer = Rvector<VolMol>;
+
+
+// MolContainer is a simple overload of Rvector for efficient removal of
+// elements. Instead of removing elements from within the vector MolContainer
+// swaps the removed elements with the last element in the vector and then
+// removes the last element.
+template<typename T>
+class MolContainer : public Rvector<T> {
+
+public:
+  using Rvector<T>::Rvector;
+  using iter = typename Rvector<T>::iterator;
+
+  iter remove(iter pos) {
+    auto last = Rvector<T>::end() - 1;
+    if (pos != last) {
+      std::swap(*pos, *last);
+    }
+    return Rvector<T>::erase(last);
+  }
+};
+
+using VolMolContainer = MolContainer<VolMol>;
 
 
 // VolMolMap holds all molecules in the simulation organized by species name

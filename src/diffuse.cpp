@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "diffuse.hpp"
+#include "vector.hpp"
 
 
 // collide determines the closes mesh element along the displacement vector
