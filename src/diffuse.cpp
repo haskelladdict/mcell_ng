@@ -72,20 +72,21 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 }
 
 
-bool process_tet(const geom::Tet& tet, const geom::Mesh& mesh, TetMols& mols) {
-  // add all incoming molecules into active queue
+// replay_incoming_mols adds all molecules from the incoming queue to the
+// active one.
+static void replay_incoming_mols(const geom::Tet& tet, TetMols& mols) {
+  auto& in = mols[tet.ID].inMols;
   auto& active = mols[tet.ID].activeMols;
-  auto& incoming = mols[tet.ID].inMols;
-  for (auto&& m: incoming) {
+  for (auto&& m: in) {
     active.add(std::move(m));
   }
-  incoming.clear();
+  in.clear();
+}
 
 
-  // actual processing comes here
-
-
-  // play all outgoing molecules into the neighboring tets
+// replay_outgoing_mols adds all molecules in the outgoing queue to the
+// incoming queues of the respective neighboring tets
+static void replay_outgoing_mols(const geom::Tet& tet, TetMols& mols) {
   auto& outgoing = mols[tet.ID].outMols;
   for (size_t i=0; i < outgoing.size(); ++i) {
     auto& out = outgoing[i];
@@ -95,11 +96,20 @@ bool process_tet(const geom::Tet& tet, const geom::Mesh& mesh, TetMols& mols) {
     size_t targetID = tet.t[i];
     assert(targetID != geom::Tet::unset);
     auto& target = mols[targetID].inMols;
-    for (auto&& m : out) {
-      target.emplace_back(std::move(m));
-    }
-    target.clear();
+    target.insert(target.end(), std::make_move_iterator(out.begin()),
+      std::make_move_iterator(out.end()));
+    out.clear();
   }
+}
 
+
+// process_tet propagates all events that happen within the tet (molecule
+// diffusion, reaction)
+bool process_tet(const geom::Tet& tet, const geom::Mesh& mesh, TetMols& mols) {
+  replay_incoming_mols(tet, mols);
+
+
+
+  replay_outgoing_mols(tet, mols);
   return true;
 }
