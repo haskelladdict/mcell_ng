@@ -8,7 +8,6 @@ if(Boost_FOUND)
     mcell_ng.cpp 
     molecules.cpp 
     rng.cpp 
-    species.cpp 
     state.cpp
     )
 endif()

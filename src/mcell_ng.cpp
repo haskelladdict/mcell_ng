@@ -21,9 +21,8 @@ using std::endl;
 int main() {
   cout << "Hello world" << endl;
 
-  double dt = 1e-6;
   const std::string outDir = "/Users/markus/programming/cpp/mcell_ng/build/viz_data";
-  State state;
+  State state(1e-6);
 
   geom::Mesh mesh;
   geom::Tets tets;
@@ -38,11 +37,11 @@ int main() {
 
   state.add_geometry(mesh, tets);
 
-  auto aSpec = state.create_species(MolSpecies("A", 600));
-  auto mols = state.tetMols()[0];
+  auto aSpecID = state.create_species(MolSpecies("A", 600));
+  auto& tetMols = state.tetMols(0);
   for (int i=0; i < 10000; ++i) {
-    VolMol mol{aSpec, geom::Vec3{-0.000001,0.0,0.0}, 0.0};
-    mols.activeMols.add(std::move(mol));
+    VolMol mol{aSpecID, geom::Vec3{-0.000001,0.0,0.0}, 0.0};
+    tetMols.activeMols.add(std::move(mol));
   }
 /*
   auto bID = state.species().create("B", 900);
@@ -58,12 +57,11 @@ int main() {
   }
 
   // do a few diffusion steps
-  auto tetMols = state.tetMols();
   for (int i=1; i < 10; ++i) {
     cout << "iteration:   " << i << endl;
-    for (const auto& tet : state.tets()) {
-      cout << "the tet" << endl;
-      process_tet(tet, mesh, tetMols);
+
+    for (size_t tetID = 0; tetID < state.tets().size(); ++tetID) {
+      process_tet(state, tetID);
     }
 #if 0
     for (auto& spec : state.species()) {

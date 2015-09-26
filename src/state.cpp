@@ -7,7 +7,7 @@
 #include "state.hpp"
 
 // constructor
-State::State(uint64_t seed) : rng_{seed} {}
+State::State(double dt, uint64_t seed) : dt_{dt}, rng_{seed} {}
 
 
 // add_geometry adds the model geometry to the state. The model geometry is
@@ -18,5 +18,5 @@ void State::add_geometry(const geom::Mesh& mesh, const geom::Tets& tets) {
   tets_ = tets;
 
   // initialize the per tet MolState
-  tetMols_ = TetMols{tets_.size()};
+  tetMolStates_ = TetMolStates{tets_.size()};
 }

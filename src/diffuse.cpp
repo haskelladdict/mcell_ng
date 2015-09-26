@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 #include "diffuse.hpp"
 #include "vector.hpp"
@@ -10,12 +11,13 @@
 
 // collide determines the closes mesh element along the displacement vector
 // (if any) and the corresponding hitpoint on the mesh
-int collide(const State& state, VolMol& mol, geom::Vec3& disp) {
+std::tuple<int, geom::Vec3> collide(const State& state, VolMol& mol,
+  geom::Vec3& disp) {
 
   geom::Vec3 hitPoint;
   geom::Vec3 disp_rem;
 
-  const auto& mesh = state.get_mesh();
+  const auto& mesh = state.mesh();
   geom::Mesh::const_iterator m = mesh.end();
   double disp_len2 = std::numeric_limits<float>::max();
   for (geom::Mesh::const_iterator it = mesh.begin(); it != mesh.end(); ++it) {
@@ -32,10 +34,14 @@ int collide(const State& state, VolMol& mol, geom::Vec3& disp) {
     }
   }
 
+  int status = 1;
   if (m == mesh.end()) {
-    return 0;
+    status = 0;
   }
+  return std::make_tuple(status, hitPoint);
+}
 
+#if 0
   // reflect: Rr = Ri - 2 N (Ri * N)
   disp = disp_rem - (2 * (disp_rem * m->n_norm)) * m->n_norm;
 
@@ -54,6 +60,7 @@ int collide(const State& state, VolMol& mol, geom::Vec3& disp) {
   mol.moveTo(hitPoint);
   return 1;
 }
+#endif
 
 
 bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
@@ -64,7 +71,7 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
     scale * state.rng_norm()};
 
   // diffuse and collide until we're at the end of our diffusion step
-  while (collide(state, mol, disp)) {}
+  //while (collide(state, mol, disp)) {}
   if (norm2(disp) > 0) {
     mol.moveTo(mol.pos() + disp);
   }
@@ -74,20 +81,19 @@ bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt) {
 
 // replay_incoming_mols adds all molecules from the incoming queue to the
 // active one.
-static void replay_incoming_mols(const geom::Tet& tet, TetMols& mols) {
-  auto& in = mols[tet.ID].inMols;
-  auto& active = mols[tet.ID].activeMols;
-  for (auto&& m: in) {
+static void replay_incoming_mols(TetMolState& molState) {
+  auto& active = molState.activeMols;
+  for (auto&& m: molState.inMols) {
     active.add(std::move(m));
   }
-  in.clear();
+  molState.inMols.clear();
 }
 
 
 // replay_outgoing_mols adds all molecules in the outgoing queue to the
 // incoming queues of the respective neighboring tets
-static void replay_outgoing_mols(const geom::Tet& tet, TetMols& mols) {
-  auto& outgoing = mols[tet.ID].outMols;
+static void replay_outgoing_mols(const geom::Tet& tet, TetMolState& molState) {
+  auto& outgoing = molState.outMols;
   for (size_t i=0; i < outgoing.size(); ++i) {
     auto& out = outgoing[i];
     if (out.size() == 0) {
@@ -95,7 +101,7 @@ static void replay_outgoing_mols(const geom::Tet& tet, TetMols& mols) {
     }
     size_t targetID = tet.t[i];
     assert(targetID != geom::Tet::unset);
-    auto& target = mols[targetID].inMols;
+    auto& target = molState.inMols;
     target.insert(target.end(), std::make_move_iterator(out.begin()),
       std::make_move_iterator(out.end()));
     out.clear();
@@ -105,11 +111,28 @@ static void replay_outgoing_mols(const geom::Tet& tet, TetMols& mols) {
 
 // process_tet propagates all events that happen within the tet (molecule
 // diffusion, reaction)
-bool process_tet(const geom::Tet& tet, const geom::Mesh& mesh, TetMols& mols) {
-  replay_incoming_mols(tet, mols);
+bool process_tet(State& state, size_t tetID) {
 
+  const geom::Mesh& mesh = state.mesh();
+  const geom::Tet& tet = state.tets()[tetID];
+  const SpeciesContainer& specs = state.species();
+  TetMolState& molState = state.tetMols(tetID);
+  double dt = state.dt();
 
+  replay_incoming_mols(molState);
 
-  replay_outgoing_mols(tet, mols);
+  size_t specID;
+  VolMolContainer mols;
+  for (auto& s : molState.activeMols) {
+    std::tie(specID, mols) = s;
+    double scale = sqrt(4*specs[specID].D()*state.dt());
+    std::cout << "foo" << std::endl;
+    for (auto& m : mols) {
+      geom::Vec3 disp{scale * state.rng_norm(), scale * state.rng_norm(),
+        scale * state.rng_norm()};
+    }
+  }
+
+  replay_outgoing_mols(tet, molState);
   return true;
 }

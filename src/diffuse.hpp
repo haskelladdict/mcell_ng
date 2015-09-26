@@ -9,6 +9,6 @@
 
 bool diffuse(State& state, const MolSpecies& spec, VolMol& mol, double dt);
 
-bool process_tet(const geom::Tet& test, const geom::Mesh& mesh, TetMols& mols);
+bool process_tet(State& state, size_t tetID);
 
 #endif

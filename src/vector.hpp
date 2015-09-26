@@ -4,6 +4,8 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include <cmath>
+#include <limits>
 #include <ostream>
 
 

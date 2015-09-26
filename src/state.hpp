@@ -4,9 +4,6 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include <iostream>
-#include <unordered_map>
-
 #include "geometry.hpp"
 #include "molecules.hpp"
 #include "rng.hpp"
@@ -18,7 +15,7 @@ class State {
 
 public:
 
-  State(uint64_t seed = 0);
+  State(double dt, uint64_t seed = 0);
 
   // don't allow copy & move operations
   State(const State& s) = delete;
@@ -34,39 +31,40 @@ public:
   // mesh related functionality
   void add_geometry(const geom::Mesh& mesh, const geom::Tets& tets);
 
-  const geom::Mesh& get_mesh() const {
+  double dt() const noexcept {
+    return dt_;
+  }
+
+  const geom::Mesh& mesh() const noexcept {
     return mesh_;
   }
 
-  const geom::Tets& tets() const {
+  const geom::Tets& tets() const noexcept {
     return tets_;
   }
 
-  TetMols& tetMols() {
-    return tetMols_;
+  TetMolState& tetMols(size_t i) {
+    return tetMolStates_[i];
   }
 
-  MolSpecies* create_species(MolSpecies spec) {
+  size_t create_species(MolSpecies spec) {
     species_.emplace_back(std::move(spec));
-    return &species_[species_.size()-1];
+    return species_.size() - 1;
   }
 
-  SpeciesContainer& species() {
+  const SpeciesContainer& species() const noexcept {
     return species_;
   }
 
-/*
-  VolMolMap& volMols() {
-    return volMolMap_;
-  }
-*/
 private:
 
   mutable RngNorm rng_;
 
+  double dt_;
+
   geom::Mesh mesh_;
   geom::Tets tets_;
-  TetMols tetMols_;
+  TetMolStates tetMolStates_;
 
   SpeciesContainer species_;
 };

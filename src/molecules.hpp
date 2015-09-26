@@ -9,27 +9,28 @@
 
 #include "species.hpp"
 #include "vector.hpp"
+#include "util.hpp"
 
 // Mol is the abstract base class for describing 2D and 3D molecules
 class Mol {
 
 public:
-  Mol(const MolSpecies* spec, double t);
+  Mol(size_t specID, double t);
   virtual ~Mol() = 0;
 
 
-  double t() const {
+  double t() const noexcept {
     return t_;
   }
 
-  const MolSpecies* spec() const {
-    return spec_;
+  size_t specID() const noexcept {
+    return specID_;
   }
 
 
 private:
-  const MolSpecies* spec_;  // what species are we
-  double t_;                // birthday
+  size_t specID_;  // what species are we
+  double t_;       // birthday
 };
 
 
@@ -38,7 +39,7 @@ class VolMol : public Mol {
 
 public:
 
-  VolMol(const MolSpecies* spec, const geom::Vec3& pos, double t);
+  VolMol(size_t specID, const geom::Vec3& pos, double t);
 
   const geom::Vec3& pos() const noexcept {
     return pos_;
@@ -75,11 +76,12 @@ public:
 using VolMolContainer = MolContainer<VolMol>;
 
 
-// VolMolMap holds all molecules in the simulation organized by species name
+// VolMolMap holds all molecules in the simulation organized by species id
 class VolMolMap {
 
 public:
-  using mapped_type = std::unordered_map<std::string, VolMolContainer>::mapped_type;
+  using mapped_type = std::unordered_map<size_t, VolMolContainer>::mapped_type;
+  using iterator = std::unordered_map<size_t, VolMolContainer>::iterator;
 
   // add an existing VolMol and take possession
   void add(VolMol&& volMol);
@@ -87,18 +89,27 @@ public:
   // delete a volume molecule
   bool del(VolMol& mol);
 
-  mapped_type& operator[](std::string specName) {
-    return volMolMap_[specName];
+  // provide iterators to underlying map
+  iterator begin() noexcept {
+    return volMolMap_.begin();
+  }
+
+  iterator end() noexcept {
+    return volMolMap_.end();
+  }
+
+  mapped_type& operator[](size_t specID) {
+    return volMolMap_[specID];
   }
 
 private:
 
-  std::unordered_map<std::string, VolMolContainer> volMolMap_;
+  std::unordered_map<size_t, VolMolContainer> volMolMap_;
 };
 
 
 // MolState keeps track of all molecules within a tet
-struct MolState {
+struct TetMolState {
 
   // active molecules located in this tet
   VolMolMap activeMols;
@@ -110,7 +121,7 @@ struct MolState {
   Rvector<VolMolContainer> outMols{4};
 };
 
-using TetMols = Rvector<MolState>;
+using TetMolStates = Rvector<TetMolState>;
 
 
 #endif

@@ -12,6 +12,7 @@
 #include <boost/format.hpp>
 
 #include "io.hpp"
+#include "molecules.hpp"
 #include "util.hpp"
 
 

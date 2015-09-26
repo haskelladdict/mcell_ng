@@ -8,7 +8,7 @@
 
 
 // Mol constructor
-Mol::Mol(const MolSpecies *spec, double t) : spec_{spec}, t_{t} {}
+Mol::Mol(size_t specID, double t) : specID_{specID}, t_{t} {}
 
 
 // Mol destructor - provide implementation since we use a pure virtual destructor
@@ -16,8 +16,8 @@ Mol::~Mol() {};
 
 
 // VolMol constructor
-VolMol::VolMol(const MolSpecies *spec, const geom::Vec3& pos, double t)
-  : Mol(spec, t), pos_{pos} {}
+VolMol::VolMol(size_t specID, const geom::Vec3& pos, double t)
+  : Mol(specID, t), pos_{pos} {}
 
 
 // moveTo moves the volume molecule to a new position
@@ -28,17 +28,17 @@ void VolMol::moveTo(const geom::Vec3& to) {
 
 // add an existing VolMol and takes possession
 void VolMolMap::add(VolMol&& mol) {
-  auto specName = mol.spec()->name();
-  if (volMolMap_.find(specName) == volMolMap_.end()) {
-    volMolMap_[specName] = VolMolContainer{};
+  auto specID = mol.specID();
+  if (volMolMap_.find(specID) == volMolMap_.end()) {
+    volMolMap_[specID] = VolMolContainer{};
   }
-  volMolMap_[specName].emplace_back(mol);
+  volMolMap_[specID].emplace_back(mol);
 }
 
 
 // del erases the provided volume molecule from the simulation
 bool VolMolMap::del(VolMol& mol) {
-  VolMolContainer& vm = volMolMap_[mol.spec()->name()];
+  VolMolContainer& vm = volMolMap_[mol.specID()];
   auto it = std::find_if(vm.begin(), vm.end(), [&mol](const auto& p) {
     return &p == &mol;
   });
