@@ -48,9 +48,7 @@ public:
   Vec3 u, v;      // triangle vectors
   Vec3 n;         // normal vector
   Vec3 n_norm;    // normalized normal vector - precomputed for efficiency
-
-private:
-  MeshProp prop_;  // properties of this element
+  MeshProp prop;  // properties of this element
 };
 
 using Mesh = Rvector<MeshElement>;
@@ -66,7 +64,7 @@ using Mesh = Rvector<MeshElement>;
 //  2: triangle and ray do not intersect
 //  3: ray and triangle are co-planar
 //  4: triangle is degenerate
-int intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
+int intersect(const Vec3& p0, const Vec3& disp, const MeshElement* m,
   Vec3* hitPoint);
 
 
@@ -100,6 +98,7 @@ struct Tet {
 };
 
 using Tets = Rvector<Tet>;
+using TetMeshes = std::array<const MeshElement*, 4>;
 
 // tetFaces lists the indices of all triangles that make up the four
 // faces of a tet

@@ -9,7 +9,7 @@
 
 // MeshElement constructor
 geom::MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
-  MeshProp prop) : a{av}, b{bv}, c{cv}, prop_{prop} {
+  MeshProp p) : a{av}, b{bv}, c{cv}, prop{p} {
 
   u = b - a;
   v = c - a;
@@ -31,14 +31,14 @@ geom::MeshElement::MeshElement(const Vec3& av, const Vec3& bv, const Vec3& cv,
 //
 // NOTE: This function was adapted from Dan Sunday
 // <http://geomalgorithms.com/a06-_intersect-2.html#intersect3D_RayTriangle()>
-int geom::intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
+int geom::intersect(const Vec3& p0, const Vec3& disp, const MeshElement* m,
   Vec3* hitPoint) {
 
   // compute intersection of ray from p0 along disp with plane in which m is
   // located
-  Vec3 w0 = p0 - m.a;
-  double a = -(m.n * w0);
-  double b = m.n * disp;
+  Vec3 w0 = p0 - m->a;
+  double a = -(m->n * w0);
+  double b = m->n * disp;
   if (fabs(b) < EPSILON) {  // our ray is parallel to triangle plane
     if (same(a, 0.0)) { // our ray is coplanar with the triangle
       return 3;
@@ -57,9 +57,9 @@ int geom::intersect(const Vec3& p0, const Vec3& disp, const MeshElement& m,
 
   // now test that hitPoint is within the triangle
   // we use local variable for efficiency
-  Vec3 w = *hitPoint - m.a;
-  Vec3 u = m.u;
-  Vec3 v = m.v;
+  Vec3 w = *hitPoint - m->a;
+  Vec3 u = m->u;
+  Vec3 v = m->v;
   double uu = u * u;
   double uv = u * v;
   double vv = v * v;

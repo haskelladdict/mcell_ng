@@ -40,8 +40,9 @@ int main() {
   auto aSpecID = state.create_species(MolSpecies("A", 600));
   auto& tetMols = state.tetMols(0);
   for (int i=0; i < 10000; ++i) {
-    VolMol mol{aSpecID, geom::Vec3{-0.000001,0.0,0.0}, 0.0};
-    tetMols.activeMols.add(std::move(mol));
+    //VolMol mol{aSpecID, geom::Vec3{-0.000001,0.0,0.0}, 0.0};
+    //tetMols.activeMols.add(std::move(mol));
+    tetMols.activeMols.add(std::make_unique<VolMol>(VolMol{aSpecID, geom::Vec3{-0.000001,0.0,0.0}, 0.0}));
   }
 /*
   auto bID = state.species().create("B", 900);

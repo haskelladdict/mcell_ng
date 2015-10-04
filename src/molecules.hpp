@@ -33,34 +33,31 @@ private:
   double t_;       // birthday
 };
 
-
 // VolMol describes volume molecules
 class VolMol : public Mol {
-
-public:
-
+ public:
   VolMol(size_t specID, const geom::Vec3& pos, double t);
 
-  const geom::Vec3& pos() const noexcept {
-    return pos_;
-  }
+  const geom::Vec3& pos() const noexcept { return pos_; }
 
   void moveTo(const geom::Vec3& to);
 
+  bool inFlight = false;
+  geom::Vec3 dispRem;  // diffusive motion remaining in current iteration
 
-private:
+ private:
   geom::Vec3 pos_;
 };
 
+using VolMolPtr = std::unique_ptr<VolMol>;
 
 // MolContainer is a simple overload of Rvector for efficient removal of
 // elements. Instead of removing elements from within the vector MolContainer
 // swaps the removed elements with the last element in the vector and then
 // removes the last element.
-template<typename T>
+template <typename T>
 class MolContainer : public Rvector<T> {
-
-public:
+ public:
   using Rvector<T>::Rvector;
   using iter = typename Rvector<T>::iterator;
 
@@ -73,44 +70,34 @@ public:
   }
 };
 
-using VolMolContainer = MolContainer<VolMol>;
-
+//using VolMolContainer = MolContainer<VolMol>;
+using VolMolContainer = Rvector<VolMolPtr>;
 
 // VolMolMap holds all molecules in the simulation organized by species id
 class VolMolMap {
-
-public:
+ public:
   using mapped_type = std::unordered_map<size_t, VolMolContainer>::mapped_type;
   using iterator = std::unordered_map<size_t, VolMolContainer>::iterator;
 
   // add an existing VolMol and take possession
-  void add(VolMol&& volMol);
+  void add(VolMolPtr volMol);
 
   // delete a volume molecule
-  bool del(VolMol& mol);
+  bool del(VolMolPtr mol);
 
   // provide iterators to underlying map
-  iterator begin() noexcept {
-    return volMolMap_.begin();
-  }
+  iterator begin() noexcept { return volMolMap_.begin(); }
 
-  iterator end() noexcept {
-    return volMolMap_.end();
-  }
+  iterator end() noexcept { return volMolMap_.end(); }
 
-  mapped_type& operator[](size_t specID) {
-    return volMolMap_[specID];
-  }
+  mapped_type& operator[](size_t specID) { return volMolMap_[specID]; }
 
-private:
-
+ private:
   std::unordered_map<size_t, VolMolContainer> volMolMap_;
 };
 
-
 // MolState keeps track of all molecules within a tet
 struct TetMolState {
-
   // active molecules located in this tet
   VolMolMap activeMols;
 
@@ -122,6 +109,5 @@ struct TetMolState {
 };
 
 using TetMolStates = Rvector<TetMolState>;
-
 
 #endif

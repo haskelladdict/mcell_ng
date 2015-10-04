@@ -27,20 +27,20 @@ void VolMol::moveTo(const geom::Vec3& to) {
 
 
 // add an existing VolMol and takes possession
-void VolMolMap::add(VolMol&& mol) {
-  auto specID = mol.specID();
+void VolMolMap::add(VolMolPtr mol) {
+  auto specID = mol->specID();
   if (volMolMap_.find(specID) == volMolMap_.end()) {
     volMolMap_[specID] = VolMolContainer{};
   }
-  volMolMap_[specID].emplace_back(mol);
+  volMolMap_[specID].emplace_back(std::move(mol));
 }
 
 
 // del erases the provided volume molecule from the simulation
-bool VolMolMap::del(VolMol& mol) {
-  VolMolContainer& vm = volMolMap_[mol.specID()];
+bool VolMolMap::del(VolMolPtr mol) {
+  VolMolContainer& vm = volMolMap_[mol->specID()];
   auto it = std::find_if(vm.begin(), vm.end(), [&mol](const auto& p) {
-    return &p == &mol;
+    return p == mol;
   });
   if (it != vm.end()) {
     vm.erase(it);
